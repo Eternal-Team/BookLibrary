@@ -1,0 +1,15 @@
+Mods: {
+	BookLibrary: {  
+		UI: {
+			BookName: The One Book
+		},
+		Book: {
+			PortableStorageBook: {
+				Name: Portable Storage
+			},
+			OtherBook: {
+                Name: Other Book
+            }
+		}
+	}
+}
