@@ -2,14 +2,29 @@ Mods: {
 	BookLibrary: {  
 		UI: {
 			BookName: The One Book
+			BookDescription:
+			'''
+			The One Book provides information about your favorite mods.
+			Please start by selecting a book on the left page.
+			'''
 		},
 		Book: {
 			PortableStorageBook: {
 				Name: Portable Storage
 			},
 			OtherBook: {
-                Name: Other Book
-            }
+				Name: Other Book
+			}
+		},
+		Items: {
+			BookItem: {
+				DisplayName: The One Book
+				Tooltip:
+				'''
+				'One book to rule them all'
+				Displays information about your favorite mods!
+				'''
+			}
 		}
 	}
 }
