@@ -1,4 +1,4 @@
-using BaseLibrary;
+using BaseLibrary.Items;
 using BaseLibrary.UI;
 using Terraria;
 using Terraria.ID;

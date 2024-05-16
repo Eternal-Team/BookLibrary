@@ -40,17 +40,19 @@ public class BookCategory
 {
 	public List<BookEntry> Items = [];
 	public string Name;
-	public string Texture;
+	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
 }
 
 // Adventurer Bag, Ammo Bag, ...
 public class BookEntry
 {
-	public List<BookSomething> Something = [];
+	public List<BookEntryItem> Items = [];
+	public string Name;
+	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
 }
 
 // text, image, recipe, ...
-public class BookSomething
+public abstract class BookEntryItem
 {
 }
 
@@ -78,50 +80,6 @@ public abstract class ModBook : ModType, ILocalizedModType
 	}
 }
 
-public class UIModBook : BaseElement
-{
-	private readonly UIText textBookName;
-
-	public UIModBook()
-	{
-		textBookName = new UIText("test")
-		{
-			Size = Dimension.FromPercent(100),
-			Settings = { VerticalAlignment = VerticalAlignment.Center }
-		};
-
-		Add(new BaseElement
-		{
-			Size = Dimension.FromPixels(420, 685),
-			Children =
-			{
-				// note: or keep the same as the main page?
-				// this would be a good use for horizontal UIGrid
-				new UIPanel
-				{
-					Size = new Dimension(-24, 40, 100, 0),
-					Settings = { BorderColor = Color.Transparent, BackgroundColor = new Color(0, 0, 0, 150) },
-					Children = { textBookName }
-				},
-				new UIPanel
-				{
-					Size = new Dimension(20, 40, 0, 0),
-					Position = Dimension.FromPercent(100, 0)
-				}.AddOnClick(args =>
-				{
-					BookUI.Instance.SetMainPage();
-					args.Handled = true;
-				})
-			}
-		});
-	}
-
-	public void SetBook(ModBook book)
-	{
-		textBookName.Text = book.GetLocalization("Name");
-	}
-}
-
 // TODO: SFX
 // TODO: Different font
 // TODO: hovering animations
@@ -136,14 +94,39 @@ public class BookUI : UIPanel
 	private readonly BaseElement uiCategory;
 	private readonly BaseElement uiMain;
 
+	private readonly Queue<BaseElement> lastPages = [];
+	private BaseElement currentElement;
+
 	public BookUI()
 	{
 		Instance = this;
-		Display = Display.None;
 
-		Settings.Texture = ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/BookBackground");
 		Size = BookSize;
 		Position = Dimension.FromPercent(50);
+		Display = Display.None;
+		Settings.Texture = ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/BookBackground");
+
+		UITexture textureReturn = new(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/ReturnButton"))
+		{
+			Size = Dimension.FromPixels(30),
+			Position = Dimension.FromPixels(28, 12),
+			Settings = { ScaleMode = ScaleMode.Stretch, SamplerState = SamplerState.PointClamp }
+		};
+		textureReturn.OnClick += args =>
+		{
+			if (lastPages.TryDequeue(out BaseElement? element))
+			{
+				element.Display = Display.Visible;
+				if (currentElement != null) currentElement.Display = Display.None;
+			}
+			else
+			{
+				Display = Display.None;
+			}
+
+			args.Handled = true;
+		};
+		Add(textureReturn);
 
 		uiMain = SetupMainPage();
 		Add(uiMain);
@@ -199,12 +182,6 @@ public class BookUI : UIPanel
 			Position = Dimension.FromPercent(100, 0),
 			Children =
 			{
-				new UITexture(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/CloseButton"))
-				{
-					Size = Dimension.FromPixels(32),
-					Position = Dimension.FromPercent(100, 0),
-					Settings = { ScaleMode = ScaleMode.Stretch, SamplerState = SamplerState.PointClamp }
-				}.AddOnClick(_ => Display = Display.None),
 				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookDescription"))
 				{
 					Size = new Dimension(0, -40, 100, 100),
@@ -216,7 +193,7 @@ public class BookUI : UIPanel
 
 		wrapper.Add(pageRight);
 
-		var grid = new UIGrid<UIBookItem>
+		UIGrid<UIBookItem> grid = new()
 		{
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48)
@@ -231,6 +208,9 @@ public class BookUI : UIPanel
 				uiMain.Display = Display.None;
 				uiBook.Display = Display.Visible;
 				uiBook.SetBook(modBook);
+
+				lastPages.Enqueue(uiMain);
+				currentElement = uiBook;
 
 				args.Handled = true;
 			}));
