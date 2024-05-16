@@ -1,4 +1,3 @@
-using BaseLibrary.Input;
 using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,11 +7,11 @@ namespace BookLibrary;
 
 public class UIBookItem : UIPanel
 {
-	private readonly ModBookEntry _book;
+	private readonly ModBook _book;
 	private readonly UITexture icon;
 	private readonly UIText name;
 
-	public UIBookItem(ModBookEntry book)
+	public UIBookItem(ModBook book)
 	{
 		_book = book;
 		Settings.BorderColor = Color.Transparent;

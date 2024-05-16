@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,17 +7,15 @@ using Terraria.ModLoader;
 
 namespace BookLibrary;
 
-public class PortableStorageBook : ModBookEntry
+public class PortableStorageBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
 		AddCategory(new BookCategory { Name = "Items" });
-
-		// will need to kind of compositor for entries
 	}
 }
 
-public class OtherBook : ModBookEntry
+public class OtherBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
@@ -28,23 +25,36 @@ public class OtherBook : ModBookEntry
 
 public static class BookLoader
 {
-	internal static readonly IList<ModBookEntry> items = new List<ModBookEntry>();
+	internal static readonly IList<ModBook> items = new List<ModBook>();
 	public static int ItemCount { get; private set; }
 
-	internal static int Register(ModBookEntry item)
+	internal static int Register(ModBook item)
 	{
 		items.Add(item);
 		return ItemCount++;
 	}
 }
 
+// Items, Mechanics, Tiles, ...
 public class BookCategory
 {
+	public List<BookEntry> Items = [];
 	public string Name;
 	public string Texture;
 }
 
-public abstract class ModBookEntry : ModType, ILocalizedModType
+// Adventurer Bag, Ammo Bag, ...
+public class BookEntry
+{
+	public List<BookSomething> Something = [];
+}
+
+// text, image, recipe, ...
+public class BookSomething
+{
+}
+
+public abstract class ModBook : ModType, ILocalizedModType
 {
 	public List<BookCategory> Categories = [];
 
@@ -58,7 +68,7 @@ public abstract class ModBookEntry : ModType, ILocalizedModType
 
 	protected sealed override void Register()
 	{
-		ModTypeLookup<ModBookEntry>.Register(this);
+		ModTypeLookup<ModBook>.Register(this);
 		BookLoader.Register(this);
 	}
 
@@ -66,38 +76,65 @@ public abstract class ModBookEntry : ModType, ILocalizedModType
 	{
 		SetStaticDefaults();
 	}
+}
 
-	// When you first open the book it should show all registered books
+public class UIModBook : BaseElement
+{
+	private readonly UIText textBookName;
 
-	// Portable Storage (this can replace 'The One Book')
-	//    -> Items
-	//          -> Adventurer Bag
-	//                 -> Icon
-	//                 -> Text
-	//                 -> Recipe
-	//          -> Ammo Bag
-	//          -> Builder's Satchel
-	//          -> etc.
-	//    -> Mechanics
-	//          -> Autopickup
-	//                 -> Text
-	//                 -> Image
+	public UIModBook()
+	{
+		textBookName = new UIText("test")
+		{
+			Size = Dimension.FromPercent(100),
+			Settings = { VerticalAlignment = VerticalAlignment.Center }
+		};
+
+		Add(new BaseElement
+		{
+			Size = Dimension.FromPixels(420, 685),
+			Children =
+			{
+				// note: or keep the same as the main page?
+				// this would be a good use for horizontal UIGrid
+				new UIPanel
+				{
+					Size = new Dimension(-24, 40, 100, 0),
+					Settings = { BorderColor = Color.Transparent, BackgroundColor = new Color(0, 0, 0, 150) },
+					Children = { textBookName }
+				},
+				new UIPanel
+				{
+					Size = new Dimension(20, 40, 0, 0),
+					Position = Dimension.FromPercent(100, 0)
+				}.AddOnClick(args =>
+				{
+					BookUI.Instance.SetMainPage();
+					args.Handled = true;
+				})
+			}
+		});
+	}
+
+	public void SetBook(ModBook book)
+	{
+		textBookName.Text = book.GetLocalization("Name");
+	}
 }
 
 // TODO: SFX
+// TODO: Different font
 // TODO: hovering animations
+// TODO: video support - 'Xna.VideoPlayer' https://rbwhitaker.com/tutorials/xna/advanced/video-playback/
 public class BookUI : UIPanel
 {
 	public static BookUI Instance = null!;
-
 	private static readonly Dimension BookSize = Dimension.FromPixels(1010, 740);
 	private static readonly Dimension WrapperSize = Dimension.FromPixels(910, 685);
 	private static readonly Dimension WrapperPosition = Dimension.FromPixels(45, 25);
-
-	// NOTE: could also isolate this to classes
-	private readonly BaseElement wrapperBook;
-	private readonly BaseElement wrapperCategory;
-	private readonly BaseElement wrapperMain;
+	private readonly UIModBook uiBook;
+	private readonly BaseElement uiCategory;
+	private readonly BaseElement uiMain;
 
 	public BookUI()
 	{
@@ -108,12 +145,23 @@ public class BookUI : UIPanel
 		Size = BookSize;
 		Position = Dimension.FromPercent(50);
 
-		wrapperMain = SetupMainPage();
-		Add(wrapperMain);
+		uiMain = SetupMainPage();
+		Add(uiMain);
 
-		wrapperBook = SetupBookPage();
-		wrapperBook.Display = Display.None;
-		Add(wrapperBook);
+		uiBook = new UIModBook
+		{
+			Size = WrapperSize,
+			Position = WrapperPosition,
+			Display = Display.None
+		};
+
+		Add(uiBook);
+	}
+
+	public void SetMainPage()
+	{
+		uiMain.Display = Display.Visible;
+		uiBook.Display = Display.None;
 	}
 
 	private BaseElement SetupMainPage()
@@ -168,71 +216,25 @@ public class BookUI : UIPanel
 
 		wrapper.Add(pageRight);
 
-		int index = 0;
-		int size = 64;
-		// todo: actual grid
-		foreach (ModBookEntry bookEntry in BookLoader.items)
+		var grid = new UIGrid<UIBookItem>
 		{
-			UIBookItem item = new(bookEntry)
-			{
-				Size = new Dimension(0, size, 100, 0),
-				Position = Dimension.FromPixels(0, 48 + (size + 8) * index++)
-			};
-
-			item.OnClick += args =>
-			{
-				wrapperMain.Display = Display.None;
-				wrapperBook.Display = Display.Visible;
-				(wrapperBook.First().First().First() as UIText)!.Text = bookEntry.GetLocalization("Name");
-				args.Handled = true;
-			};
-
-			pageLeft.Add(item);
-		}
-
-		return wrapper;
-	}
-
-	private BaseElement SetupBookPage()
-	{
-		BaseElement wrapper = new()
-		{
-			Size = WrapperSize,
-			Position = WrapperPosition
+			Size = new Dimension(0, -48, 100, 100),
+			Position = Dimension.FromPixels(0, 48)
 		};
 
-		wrapper.Add(new BaseElement
+		pageLeft.Add(grid);
+
+		foreach (ModBook modBook in BookLoader.items)
 		{
-			Size = Dimension.FromPixels(420, 685),
-			Children =
+			grid.Add(new UIBookItem(modBook) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args =>
 			{
-				// note: or keep the same as the main page?
-				// this would be a good use for horizontal UIGrid
-				new UIPanel
-				{
-					Size = new Dimension(-24, 40, 100, 0),
-					Settings = { BorderColor = Color.Transparent, BackgroundColor = new Color(0, 0, 0, 150) },
-					Children =
-					{
-						new UIText("test")
-						{
-							Size = Dimension.FromPercent(100),
-							Settings = { VerticalAlignment = VerticalAlignment.Center }
-						}
-					}
-				},
-				new UIPanel
-				{
-					Size = new Dimension(20, 40, 0, 0),
-					Position = Dimension.FromPercent(100, 0)
-				}.AddOnClick(args =>
-				{
-					wrapperMain.Display = Display.Visible;
-					wrapperBook.Display = Display.None;
-					args.Handled = true;
-				})
-			}
-		});
+				uiMain.Display = Display.None;
+				uiBook.Display = Display.Visible;
+				uiBook.SetBook(modBook);
+
+				args.Handled = true;
+			}));
+		}
 
 		return wrapper;
 	}
