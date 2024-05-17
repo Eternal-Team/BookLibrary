@@ -24,7 +24,7 @@ public class UIBookItem : UIPanel
 
 		Add(icon);
 
-		name = new UIText(book.GetLocalization("Name"))
+		name = new UIText(book.DisplayName)
 		{
 			Settings = { VerticalAlignment = VerticalAlignment.Center }
 		};

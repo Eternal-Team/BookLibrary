@@ -3,6 +3,7 @@ using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace BookLibrary;
@@ -11,7 +12,16 @@ public class PortableStorageBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
-		AddCategory(new BookCategory { Name = "Items" });
+		BookCategory bookCategory = new() { Name = "Items" };
+		bookCategory.Items.Add(new BookEntry { Name = "Normals Bags" });
+		bookCategory.Items.Add(new BookEntry { Name = "Ammo Pouch" });
+		bookCategory.Items.Add(new BookEntry { Name = "Dart Holder" });
+		bookCategory.Items.Add(new BookEntry { Name = "Fireproof Container" });
+		bookCategory.Items.Add(new BookEntry { Name = "Magazine" });
+		bookCategory.Items.Add(new BookEntry { Name = "The Perfect Solution" });
+		bookCategory.Items.Add(new BookEntry { Name = "Wallet" });
+		AddCategory(bookCategory);
+		AddCategory(new BookCategory { Name = "Mechanics", Items = { new BookEntry { Name = "Crafting" } } });
 	}
 }
 
@@ -19,7 +29,10 @@ public class OtherBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
-		AddCategory(new BookCategory { Name = "Items" });
+		for (int i = 0; i < 20; i++)
+		{
+			AddCategory(new BookCategory { Name = "Items" + i });
+		}
 	}
 }
 
@@ -35,15 +48,16 @@ public static class BookLoader
 	}
 }
 
-// Items, Mechanics, Tiles, ...
 public class BookCategory
 {
+	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Category.{Name}");
+	
 	public List<BookEntry> Items = [];
+	public ModBook Mod;
 	public string Name;
 	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
 }
 
-// Adventurer Bag, Ammo Bag, ...
 public class BookEntry
 {
 	public List<BookEntryItem> Items = [];
@@ -61,10 +75,13 @@ public abstract class ModBook : ModType, ILocalizedModType
 	public List<BookCategory> Categories = [];
 
 	public virtual string Texture => BaseLibrary.BaseLibrary.PlaceholderTexture;
-	public string LocalizationCategory => "Book";
+	public string LocalizationCategory => "Books";
+	
+	public virtual LocalizedText DisplayName => this.GetLocalization("Name", PrettyPrintName);
 
 	public void AddCategory(BookCategory category)
 	{
+		category.Mod = this;
 		Categories.Add(category);
 	}
 
@@ -139,12 +156,6 @@ public class BookUI : UIPanel
 		};
 
 		Add(uiBook);
-	}
-
-	public void SetMainPage()
-	{
-		uiMain.Display = Display.Visible;
-		uiBook.Display = Display.None;
 	}
 
 	private BaseElement SetupMainPage()

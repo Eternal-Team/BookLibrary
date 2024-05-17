@@ -8,9 +8,13 @@ Mods: {
 			Please start by selecting a book on the left page.
 			'''
 		},
-		Book: {
+		Books: {
 			PortableStorageBook: {
 				Name: Portable Storage
+				Category: {
+					Items: Items
+					Mechanics: Mechanics
+				}
 			},
 			OtherBook: {
 				Name: Other Book
