@@ -3,17 +3,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.ModLoader;
 
-namespace BookLibrary;
+namespace BookLibrary.UI;
 
-public class UIBookItem : UIPanel
+public class UIModBook : UIPanel
 {
-	private readonly ModBook _book;
+	private readonly ModBook book;
 	private readonly UITexture icon;
 	private readonly UIText name;
 
-	public UIBookItem(ModBook book)
+	public UIModBook(ModBook book)
 	{
-		_book = book;
+		this.book = book;
 		Settings.BorderColor = Color.Transparent;
 		Settings.BackgroundColor = new Color(0, 0, 0, 100);
 
@@ -22,14 +22,14 @@ public class UIBookItem : UIPanel
 			Settings = { ScaleMode = ScaleMode.Stretch }
 		};
 
-		Add(icon);
+		base.Add(icon);
 
 		name = new UIText(book.DisplayName)
 		{
 			Settings = { VerticalAlignment = VerticalAlignment.Center }
 		};
 
-		Add(name);
+		base.Add(name);
 	}
 
 	public override void Recalculate()

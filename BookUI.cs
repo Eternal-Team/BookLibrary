@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using BaseLibrary.UI;
-using Microsoft.Xna.Framework;
+using BookLibrary.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -15,22 +14,22 @@ public class PortableStorageBook : ModBook
 		BookCategory bookCategory = new() { Name = "Items" };
 		bookCategory.Items.Add(new BookEntry
 		{
-			Name = "Normals Bags",
+			Name = "NormalsBags",
 			Mod = this
 		});
 		bookCategory.Items.Add(new BookEntry
 		{
-			Name = "Ammo Pouch",
+			Name = "AmmoPouch",
 			Mod = this
 		});
 		bookCategory.Items.Add(new BookEntry
 		{
-			Name = "Dart Holder",
+			Name = "DartHolder",
 			Mod = this
 		});
 		bookCategory.Items.Add(new BookEntry
 		{
-			Name = "Fireproof Container",
+			Name = "FireproofContainer",
 			Mod = this
 		});
 		bookCategory.Items.Add(new BookEntry
@@ -40,7 +39,7 @@ public class PortableStorageBook : ModBook
 		});
 		bookCategory.Items.Add(new BookEntry
 		{
-			Name = "The Perfect Solution",
+			Name = "ThePerfectSolution",
 			Mod = this
 		});
 		bookCategory.Items.Add(new BookEntry
@@ -127,9 +126,10 @@ public class BookUI : UIPanel
 	private static readonly Dimension BookSize = Dimension.FromPixels(1010, 740);
 	private static readonly Dimension WrapperSize = Dimension.FromPixels(910, 685);
 	private static readonly Dimension WrapperPosition = Dimension.FromPixels(45, 25);
-	internal readonly UIModBook uiBook;
-	internal readonly UICategory uiCategory;
-	internal readonly BaseElement uiMain;
+
+	internal readonly UIPageMain uiMain;
+	internal readonly UIPageBook uiBook;
+	internal readonly UIPageCategory uiCategory;
 
 	internal readonly Stack<BaseElement> lastPages = [];
 	internal BaseElement currentElement;
@@ -167,11 +167,15 @@ public class BookUI : UIPanel
 		};
 		Add(textureReturn);
 
-		uiMain = SetupMainPage();
+		uiMain = new UIPageMain
+		{
+			Size = WrapperSize,
+			Position = WrapperPosition,
+		};
 		Add(uiMain);
 		currentElement = uiMain;
 
-		uiBook = new UIModBook
+		uiBook = new UIPageBook
 		{
 			Size = WrapperSize,
 			Position = WrapperPosition,
@@ -179,7 +183,7 @@ public class BookUI : UIPanel
 		};
 		Add(uiBook);
 
-		uiCategory = new UICategory
+		uiCategory = new UIPageCategory
 		{
 			Size = WrapperSize,
 			Position = WrapperPosition,
@@ -188,79 +192,11 @@ public class BookUI : UIPanel
 		Add(uiCategory);
 	}
 
-	private BaseElement SetupMainPage()
-	{
-		BaseElement wrapper = new()
-		{
-			Size = WrapperSize,
-			Position = WrapperPosition
-		};
-
-		BaseElement pageLeft = new()
-		{
-			Size = Dimension.FromPixels(420, 685),
-			Children =
-			{
-				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookName"), 1.1f)
-				{
-					Size = new Dimension(0, 30, 100, 0),
-					Settings = { HorizontalAlignment = HorizontalAlignment.Center }
-				},
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1"))
-				{
-					Size = new Dimension(0, 4, 100, 0),
-					Position = Dimension.FromPixels(0, 38),
-					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
-				}
-			}
-		};
-
-		wrapper.Add(pageLeft);
-
-		BaseElement pageRight = new()
-		{
-			Size = Dimension.FromPixels(420, 670),
-			Position = Dimension.FromPercent(100, 0),
-			Children =
-			{
-				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookDescription"))
-				{
-					Size = new Dimension(0, -40, 100, 100),
-					Position = Dimension.FromPixels(0, 40),
-					Settings = { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }
-				}
-			}
-		};
-
-		wrapper.Add(pageRight);
-
-		UIGrid<UIBookItem> grid = new()
-		{
-			Size = new Dimension(0, -48, 100, 100),
-			Position = Dimension.FromPixels(0, 48)
-		};
-
-		pageLeft.Add(grid);
-
-		foreach (ModBook modBook in BookLoader.items)
-		{
-			grid.Add(new UIBookItem(modBook) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args =>
-			{
-				PushPage(uiBook);
-				uiBook.SetBook(modBook);
-
-				args.Handled = true;
-			}));
-		}
-
-		return wrapper;
-	}
-
 	public void PushPage(BaseElement element)
 	{
-		currentElement!.Display = Display.None;
+		currentElement.Display = Display.None;
 		element.Display = Display.Visible;
-		
+
 		lastPages.Push(currentElement);
 		currentElement = element;
 	}
