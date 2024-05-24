@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-	  <Nullable>enable</Nullable>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj" />
+		<ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj"/>
 	</ItemGroup>
-	<Import Project="..\Mods.targets" />
+	<Import Project="..\Mods.targets"/>
 </Project>

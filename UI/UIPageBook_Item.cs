@@ -10,11 +10,11 @@ public class UIBookCategory : UIPanel
 	private readonly BookCategory category;
 	private readonly UITexture icon;
 	private readonly UIText name;
-	
+
 	public UIBookCategory(BookCategory category)
 	{
 		this.category = category;
-		
+
 		Settings.BorderColor = Color.Transparent;
 		Settings.BackgroundColor = new Color(0, 0, 0, 100);
 
@@ -32,7 +32,7 @@ public class UIBookCategory : UIPanel
 
 		base.Add(name);
 	}
-	
+
 	public override void Recalculate()
 	{
 		base.Recalculate();

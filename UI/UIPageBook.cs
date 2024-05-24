@@ -12,7 +12,7 @@ public class UIPageBook : BaseElement
 {
 	private readonly UIText textBookName;
 	private readonly UIGrid<UIBookCategory> grid;
-	
+
 	public UIPageBook()
 	{
 		textBookName = new UIText(LocalizedText.Empty, 1.1f)
@@ -26,7 +26,7 @@ public class UIPageBook : BaseElement
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48)
 		};
-		
+
 		BaseElement pageLeft = new()
 		{
 			Size = Dimension.FromPixels(420, 685),

@@ -54,7 +54,8 @@ public class UIPageCategory : BaseElement
 		gridEntryItems = new UIGrid<UIEntryItem>
 		{
 			Size = new Dimension(0, -48, 100, 100),
-			Position = Dimension.FromPixels(0, 48)
+			Position = Dimension.FromPixels(0, 48),
+			Settings = { ItemMargin = 8 }
 		};
 
 		BaseElement pageRight = new()
@@ -91,7 +92,7 @@ public class UIPageCategory : BaseElement
 
 				foreach (BookEntryItem entryItem in entry.Items)
 				{
-					UIEntryItem item = new(entryItem) { Size = new Dimension(0, 64, 100, 0) };
+					UIEntryItem item = new(entryItem) { Size = new Dimension(0, 20, 100, 0) };
 					gridEntryItems.Add(item);
 				}
 
