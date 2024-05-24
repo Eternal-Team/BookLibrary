@@ -15,6 +15,9 @@ Mods: {
 					Items: Items
 					Mechanics: Mechanics
 				}
+				Entry: {
+					Crafting: Crafting
+				}
 			},
 			OtherBook: {
 				Name: Other Book

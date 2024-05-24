@@ -13,15 +13,59 @@ public class PortableStorageBook : ModBook
 	public override void SetStaticDefaults()
 	{
 		BookCategory bookCategory = new() { Name = "Items" };
-		bookCategory.Items.Add(new BookEntry { Name = "Normals Bags" });
-		bookCategory.Items.Add(new BookEntry { Name = "Ammo Pouch" });
-		bookCategory.Items.Add(new BookEntry { Name = "Dart Holder" });
-		bookCategory.Items.Add(new BookEntry { Name = "Fireproof Container" });
-		bookCategory.Items.Add(new BookEntry { Name = "Magazine" });
-		bookCategory.Items.Add(new BookEntry { Name = "The Perfect Solution" });
-		bookCategory.Items.Add(new BookEntry { Name = "Wallet" });
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Normals Bags",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Ammo Pouch",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Dart Holder",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Fireproof Container",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Magazine",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "The Perfect Solution",
+			Mod = this
+		});
+		bookCategory.Items.Add(new BookEntry
+		{
+			Name = "Wallet",
+			Mod = this
+		});
 		AddCategory(bookCategory);
-		AddCategory(new BookCategory { Name = "Mechanics", Items = { new BookEntry { Name = "Crafting" } } });
+		AddCategory(new BookCategory
+		{
+			Name = "Mechanics",
+			Items =
+			{
+				new BookEntry
+				{
+					Name = "Crafting",
+					Mod = this,
+					Items =
+					{
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Image(BaseLibrary.BaseLibrary.PlaceholderTexture)
+					}
+				}
+			}
+		});
 	}
 }
 
@@ -39,7 +83,7 @@ public class OtherBook : ModBook
 public class BookCategory
 {
 	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Category.{Name}");
-	
+
 	public List<BookEntry> Items = [];
 	public ModBook Mod;
 	public string Name;
@@ -48,6 +92,9 @@ public class BookCategory
 
 public class BookEntry
 {
+	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Entry.{Name}");
+	public ModBook Mod;
+
 	public List<BookEntryItem> Items = [];
 	public string Name;
 	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
@@ -72,6 +119,8 @@ public class BookEntryItem_Image(string texturePath) : BookEntryItem
 // TODO: Different font
 // TODO: hovering animations
 // TODO: video support - 'Xna.VideoPlayer' https://rbwhitaker.com/tutorials/xna/advanced/video-playback/
+// https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Core/VideoPlayback/OgvReader.cs
+// https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Core/Interface/UIVideo.cs
 public class BookUI : UIPanel
 {
 	public static BookUI Instance = null!;
@@ -128,8 +177,15 @@ public class BookUI : UIPanel
 			Position = WrapperPosition,
 			Display = Display.None
 		};
-
 		Add(uiBook);
+
+		uiCategory = new UICategory
+		{
+			Size = WrapperSize,
+			Position = WrapperPosition,
+			Display = Display.None
+		};
+		Add(uiCategory);
 	}
 
 	private BaseElement SetupMainPage()
