@@ -36,18 +36,6 @@ public class OtherBook : ModBook
 	}
 }
 
-public static class BookLoader
-{
-	internal static readonly IList<ModBook> items = new List<ModBook>();
-	public static int ItemCount { get; private set; }
-
-	internal static int Register(ModBook item)
-	{
-		items.Add(item);
-		return ItemCount++;
-	}
-}
-
 public class BookCategory
 {
 	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Category.{Name}");
@@ -70,31 +58,14 @@ public abstract class BookEntryItem
 {
 }
 
-public abstract class ModBook : ModType, ILocalizedModType
+public class BookEntryItem_Text(string text) : BookEntryItem
 {
-	public List<BookCategory> Categories = [];
+	public readonly string Text = text;
+}
 
-	public virtual string Texture => BaseLibrary.BaseLibrary.PlaceholderTexture;
-	public string LocalizationCategory => "Books";
-	
-	public virtual LocalizedText DisplayName => this.GetLocalization("Name", PrettyPrintName);
-
-	public void AddCategory(BookCategory category)
-	{
-		category.Mod = this;
-		Categories.Add(category);
-	}
-
-	protected sealed override void Register()
-	{
-		ModTypeLookup<ModBook>.Register(this);
-		BookLoader.Register(this);
-	}
-
-	public sealed override void SetupContent()
-	{
-		SetStaticDefaults();
-	}
+public class BookEntryItem_Image(string texturePath) : BookEntryItem
+{
+	public readonly string TexturePath = texturePath;
 }
 
 // TODO: SFX
@@ -107,12 +78,12 @@ public class BookUI : UIPanel
 	private static readonly Dimension BookSize = Dimension.FromPixels(1010, 740);
 	private static readonly Dimension WrapperSize = Dimension.FromPixels(910, 685);
 	private static readonly Dimension WrapperPosition = Dimension.FromPixels(45, 25);
-	private readonly UIModBook uiBook;
-	private readonly BaseElement uiCategory;
-	private readonly BaseElement uiMain;
+	internal readonly UIModBook uiBook;
+	internal readonly UICategory uiCategory;
+	internal readonly BaseElement uiMain;
 
-	private readonly Queue<BaseElement> lastPages = [];
-	private BaseElement currentElement;
+	internal readonly Stack<BaseElement> lastPages = [];
+	internal BaseElement currentElement;
 
 	public BookUI()
 	{
@@ -129,16 +100,18 @@ public class BookUI : UIPanel
 			Position = Dimension.FromPixels(28, 12),
 			Settings = { ScaleMode = ScaleMode.Stretch, SamplerState = SamplerState.PointClamp }
 		};
-		textureReturn.OnClick += args =>
+		textureReturn.OnMouseDown += args =>
 		{
-			if (lastPages.TryDequeue(out BaseElement? element))
+			if (lastPages.TryPop(out BaseElement? element))
 			{
 				element.Display = Display.Visible;
 				if (currentElement != null) currentElement.Display = Display.None;
+				currentElement = element;
 			}
 			else
 			{
 				Display = Display.None;
+				currentElement = uiMain;
 			}
 
 			args.Handled = true;
@@ -147,6 +120,7 @@ public class BookUI : UIPanel
 
 		uiMain = SetupMainPage();
 		Add(uiMain);
+		currentElement = uiMain;
 
 		uiBook = new UIModBook
 		{
@@ -216,17 +190,22 @@ public class BookUI : UIPanel
 		{
 			grid.Add(new UIBookItem(modBook) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args =>
 			{
-				uiMain.Display = Display.None;
-				uiBook.Display = Display.Visible;
+				PushPage(uiBook);
 				uiBook.SetBook(modBook);
-
-				lastPages.Enqueue(uiMain);
-				currentElement = uiBook;
 
 				args.Handled = true;
 			}));
 		}
 
 		return wrapper;
+	}
+
+	public void PushPage(BaseElement element)
+	{
+		currentElement!.Display = Display.None;
+		element.Display = Display.Visible;
+		
+		lastPages.Push(currentElement);
+		currentElement = element;
 	}
 }

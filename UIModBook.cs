@@ -2,11 +2,11 @@ using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace BookLibrary;
 
+// Note: right side could be used for mod description
 public class UIModBook : BaseElement
 {
 	private readonly UIText textBookName;
@@ -35,7 +35,7 @@ public class UIModBook : BaseElement
 			}
 		};
 		Add(pageLeft);
-
+		
 		grid = new UIGrid<UICategoryItem>
 		{
 			Size = new Dimension(0, -48, 100, 100),
@@ -52,7 +52,13 @@ public class UIModBook : BaseElement
 		grid.Clear();
 		foreach (BookCategory category in book.Categories)
 		{
-			grid.Add(new UICategoryItem(category) { Size = new Dimension(0, 64, 100, 0) });
+			grid.Add(new UICategoryItem(category) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args =>
+			{
+				BookUI.Instance.PushPage(BookUI.Instance.uiCategory);
+				BookUI.Instance.uiCategory.SetCategory(category);
+
+				args.Handled = true;
+			}));
 		}
 	}
 }
