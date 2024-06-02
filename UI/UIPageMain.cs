@@ -18,7 +18,12 @@ public class UIPageMain : BaseElement
 				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookName"), 1.1f)
 				{
 					Size = new Dimension(0, 30, 100, 0),
-					Settings = { HorizontalAlignment = HorizontalAlignment.Center }
+					Settings =
+					{
+						HorizontalAlignment = HorizontalAlignment.Center,
+						TextColor = BookUI.TextColor,
+						BorderColor = Color.Transparent
+					}
 				},
 				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1"))
 				{
@@ -41,7 +46,13 @@ public class UIPageMain : BaseElement
 				{
 					Size = new Dimension(0, -40, 100, 100),
 					Position = Dimension.FromPixels(0, 40),
-					Settings = { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }
+					Settings =
+					{
+						HorizontalAlignment = HorizontalAlignment.Center,
+						VerticalAlignment = VerticalAlignment.Center,
+						TextColor = BookUI.TextColor,
+						BorderColor = Color.Transparent
+					}
 				}
 			}
 		};

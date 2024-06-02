@@ -26,7 +26,12 @@ public class UIModBook : UIPanel
 
 		name = new UIText(book.DisplayName)
 		{
-			Settings = { VerticalAlignment = VerticalAlignment.Center }
+			Settings =
+			{
+				VerticalAlignment = VerticalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
+			}
 		};
 
 		base.Add(name);

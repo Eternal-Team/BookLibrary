@@ -1,4 +1,5 @@
 using BaseLibrary.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -8,7 +9,7 @@ namespace BookLibrary.UI;
 
 public class UIEntryItem : BaseElement
 {
-	private readonly BaseElement element;
+	private readonly BaseElement element = null!;
 
 	public UIEntryItem(BookEntryItem entryItem)
 	{
@@ -21,7 +22,12 @@ public class UIEntryItem : BaseElement
 				element = new UIText(text.Text)
 				{
 					Size = Dimension.FromPercent(100),
-					Padding = new Padding(4)
+					Padding = new Padding(4),
+					Settings =
+					{
+						TextColor = BookUI.TextColor,
+						BorderColor = Color.Transparent
+					}
 				};
 
 				base.Add(element);
@@ -29,7 +35,7 @@ public class UIEntryItem : BaseElement
 			}
 			case BookEntryItem_Image image:
 			{
-				Asset<Texture2D> texture = ModContent.Request<Texture2D>(image.TexturePath, AssetRequestMode.ImmediateLoad);
+				Asset<Texture2D> texture = ModContent.Request<Texture2D>(image.Path, AssetRequestMode.ImmediateLoad);
 				Size.PixelsY = texture.Height();
 
 				element = new UITexture(texture) { Size = Dimension.FromPercent(100) };

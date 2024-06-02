@@ -27,7 +27,12 @@ public class UIBookEntry : UIPanel
 
 		name = new UIText(entry.DisplayName)
 		{
-			Settings = { VerticalAlignment = VerticalAlignment.Center }
+			Settings =
+			{
+				VerticalAlignment = VerticalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
+			}
 		};
 
 		base.Add(name);

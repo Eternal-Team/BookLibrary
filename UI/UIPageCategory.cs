@@ -19,7 +19,12 @@ public class UIPageCategory : BaseElement
 		textCategoryName = new UIText(LocalizedText.Empty, 1.1f)
 		{
 			Size = new Dimension(0, 30, 100, 0),
-			Settings = { HorizontalAlignment = HorizontalAlignment.Center }
+			Settings =
+			{
+				HorizontalAlignment = HorizontalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
+			}
 		};
 
 		gridEntries = new UIGrid<UIBookEntry>
@@ -48,7 +53,12 @@ public class UIPageCategory : BaseElement
 		textEntryName = new UIText(LocalizedText.Empty, 1.1f)
 		{
 			Size = new Dimension(0, 30, 100, 0),
-			Settings = { HorizontalAlignment = HorizontalAlignment.Center }
+			Settings =
+			{
+				HorizontalAlignment = HorizontalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
+			}
 		};
 
 		gridEntryItems = new UIGrid<UIEntryItem>

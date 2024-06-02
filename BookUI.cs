@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using BaseLibrary.UI;
 using BookLibrary.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -62,6 +64,11 @@ public class PortableStorageBook : ModBook
 						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
 						new BookEntryItem_Image(BaseLibrary.BaseLibrary.PlaceholderTexture),
 						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
+						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
 					}
 				}
 			}
@@ -100,7 +107,6 @@ public class BookEntry
 	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
 }
 
-// text, image, recipe, ...
 public abstract class BookEntryItem
 {
 }
@@ -110,9 +116,20 @@ public class BookEntryItem_Text(string text) : BookEntryItem
 	public readonly string Text = text;
 }
 
-public class BookEntryItem_Image(string texturePath) : BookEntryItem
+public class BookEntryItem_Image(string path) : BookEntryItem
 {
-	public readonly string TexturePath = texturePath;
+	public readonly string Path = path;
+}
+
+public class BookEntryItem_Video(string path) : BookEntryItem
+{
+	public readonly string Path = path;
+}
+
+// NOTE: this might be problematic, how do you select the right recipe? (mainly a problem if books are generated from files)
+public class BookEntryItem_Recipe(Recipe recipe) : BookEntryItem
+{
+	public readonly Recipe Recipe = recipe;
 }
 
 // TODO: SFX
@@ -127,6 +144,7 @@ public class BookUI : UIPanel
 	private static readonly Dimension BookSize = Dimension.FromPixels(1010, 740);
 	private static readonly Dimension WrapperSize = Dimension.FromPixels(910, 685);
 	private static readonly Dimension WrapperPosition = Dimension.FromPixels(45, 25);
+	internal static readonly Color TextColor = new Color(40, 25, 14);
 
 	internal readonly UIPageMain uiMain;
 	internal readonly UIPageBook uiBook;
@@ -161,20 +179,19 @@ public class BookUI : UIPanel
 			else
 			{
 				Display = Display.None;
-				currentElement = uiMain;
+				currentElement = uiMain!;
 			}
 
 			args.Handled = true;
 		};
-		Add(textureReturn);
+		base.Add(textureReturn);
 
-		uiMain = new UIPageMain
+		currentElement = uiMain = new UIPageMain
 		{
 			Size = WrapperSize,
 			Position = WrapperPosition,
 		};
-		Add(uiMain);
-		currentElement = uiMain;
+		base.Add(uiMain);
 
 		uiBook = new UIPageBook
 		{
@@ -182,7 +199,7 @@ public class BookUI : UIPanel
 			Position = WrapperPosition,
 			Display = Display.None
 		};
-		Add(uiBook);
+		base.Add(uiBook);
 
 		uiCategory = new UIPageCategory
 		{
@@ -190,7 +207,7 @@ public class BookUI : UIPanel
 			Position = WrapperPosition,
 			Display = Display.None
 		};
-		Add(uiCategory);
+		base.Add(uiCategory);
 	}
 
 	public void PushPage(BaseElement element)
