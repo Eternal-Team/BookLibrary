@@ -14,20 +14,19 @@ public class UIModBook : UIPanel
 	public UIModBook(ModBook book)
 	{
 		this.book = book;
+
+		Size = new Dimension(0, 64, 100, 0);
 		Settings.BorderColor = Color.Transparent;
 		Settings.BackgroundColor = new Color(0, 0, 0, 100);
 
-		icon = new UITexture(ModContent.Request<Texture2D>(book.Texture))
-		{
+		icon = new UITexture(ModContent.Request<Texture2D>(book.Texture)) {
 			Settings = { ScaleMode = ScaleMode.Stretch }
 		};
 
 		base.Add(icon);
 
-		name = new UIText(book.DisplayName)
-		{
-			Settings =
-			{
+		name = new UIText(book.DisplayName) {
+			Settings = {
 				VerticalAlignment = VerticalAlignment.Center,
 				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent

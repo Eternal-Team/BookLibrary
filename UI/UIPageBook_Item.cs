@@ -18,17 +18,14 @@ public class UIBookCategory : UIPanel
 		Settings.BorderColor = Color.Transparent;
 		Settings.BackgroundColor = new Color(0, 0, 0, 100);
 
-		icon = new UITexture(ModContent.Request<Texture2D>(this.category.Texture))
-		{
+		icon = new UITexture(ModContent.Request<Texture2D>(this.category.Texture)) {
 			Settings = { ScaleMode = ScaleMode.Stretch }
 		};
 
 		base.Add(icon);
 
-		name = new UIText(category.DisplayName)
-		{
-			Settings =
-			{
+		name = new UIText(category.DisplayName) {
+			Settings = {
 				VerticalAlignment = VerticalAlignment.Center,
 				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent

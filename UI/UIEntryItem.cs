@@ -13,24 +13,22 @@ public class UIEntryItem : BaseElement
 
 	public UIEntryItem(BookEntryItem entryItem)
 	{
-		// TODO: Y dimensions should be based on the UIText/UITexture/...
+		Size = new Dimension(0, 20, 100, 0);
 
 		switch (entryItem)
 		{
 			case BookEntryItem_Text text:
 			{
-				element = new UIText(text.Text)
-				{
+				element = new UIText(text.Text) {
 					Size = Dimension.FromPercent(100),
 					Padding = new Padding(4),
-					Settings =
-					{
+					Settings = {
 						TextColor = BookUI.TextColor,
 						BorderColor = Color.Transparent
 					}
 				};
-
 				base.Add(element);
+
 				break;
 			}
 			case BookEntryItem_Image image:
@@ -48,8 +46,7 @@ public class UIEntryItem : BaseElement
 
 	public override void Recalculate()
 	{
-		Size.PixelsY = element switch
-		{
+		Size.PixelsY = element switch {
 			UIText text => (int)text.TotalHeight,
 			UITexture texture => texture.Texture?.Height() ?? 20,
 			_ => Size.PixelsY

@@ -15,20 +15,18 @@ public class UIBookEntry : UIPanel
 	{
 		this.entry = entry;
 
+		Size = new Dimension(0, 64, 100, 0);
 		Settings.BorderColor = Color.Transparent;
 		Settings.BackgroundColor = new Color(0, 0, 0, 100);
 
-		icon = new UITexture(ModContent.Request<Texture2D>(this.entry.Texture))
-		{
+		icon = new UITexture(ModContent.Request<Texture2D>(this.entry.Texture)) {
 			Settings = { ScaleMode = ScaleMode.Stretch }
 		};
 
 		base.Add(icon);
 
-		name = new UIText(entry.DisplayName)
-		{
-			Settings =
-			{
+		name = new UIText(entry.DisplayName) {
+			Settings = {
 				VerticalAlignment = VerticalAlignment.Center,
 				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent

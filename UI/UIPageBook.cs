@@ -15,31 +15,25 @@ public class UIPageBook : BaseElement
 
 	public UIPageBook()
 	{
-		textBookName = new UIText(LocalizedText.Empty, 1.1f)
-		{
+		textBookName = new UIText(LocalizedText.Empty, 1.1f) {
 			Size = new Dimension(0, 30, 100, 0),
-			Settings =
-			{
-				HorizontalAlignment = HorizontalAlignment.Center, 
-				TextColor = BookUI.TextColor, 
+			Settings = {
+				HorizontalAlignment = HorizontalAlignment.Center,
+				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent
 			}
 		};
 
-		grid = new UIGrid<UIBookCategory>
-		{
+		grid = new UIGrid<UIBookCategory> {
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48)
 		};
 
-		BaseElement pageLeft = new()
-		{
+		BaseElement pageLeft = new() {
 			Size = Dimension.FromPixels(420, 685),
-			Children =
-			{
+			Children = {
 				textBookName,
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1"))
-				{
+				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
 					Size = new Dimension(0, 4, 100, 0),
 					Position = Dimension.FromPixels(0, 38),
 					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
@@ -57,8 +51,7 @@ public class UIPageBook : BaseElement
 		grid.Clear();
 		foreach (BookCategory category in book.Categories)
 		{
-			grid.Add(new UIBookCategory(category) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args =>
-			{
+			grid.Add(new UIBookCategory(category) { Size = new Dimension(0, 64, 100, 0) }.AddOnClick(args => {
 				BookUI.Instance.PushPage(BookUI.Instance.uiCategory);
 				BookUI.Instance.uiCategory.SetCategory(category);
 

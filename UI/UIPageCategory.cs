@@ -16,31 +16,25 @@ public class UIPageCategory : BaseElement
 
 	public UIPageCategory()
 	{
-		textCategoryName = new UIText(LocalizedText.Empty, 1.1f)
-		{
+		textCategoryName = new UIText(LocalizedText.Empty, 1.1f) {
 			Size = new Dimension(0, 30, 100, 0),
-			Settings =
-			{
+			Settings = {
 				HorizontalAlignment = HorizontalAlignment.Center,
 				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent
 			}
 		};
 
-		gridEntries = new UIGrid<UIBookEntry>
-		{
+		gridEntries = new UIGrid<UIBookEntry> {
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48)
 		};
 
-		BaseElement pageLeft = new()
-		{
+		BaseElement pageLeft = new() {
 			Size = Dimension.FromPixels(420, 685),
-			Children =
-			{
+			Children = {
 				textCategoryName,
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1"))
-				{
+				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
 					Size = new Dimension(0, 4, 100, 0),
 					Position = Dimension.FromPixels(0, 38),
 					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
@@ -50,32 +44,26 @@ public class UIPageCategory : BaseElement
 		};
 		base.Add(pageLeft);
 
-		textEntryName = new UIText(LocalizedText.Empty, 1.1f)
-		{
+		textEntryName = new UIText(LocalizedText.Empty, 1.1f) {
 			Size = new Dimension(0, 30, 100, 0),
-			Settings =
-			{
+			Settings = {
 				HorizontalAlignment = HorizontalAlignment.Center,
 				TextColor = BookUI.TextColor,
 				BorderColor = Color.Transparent
 			}
 		};
 
-		gridEntryItems = new UIGrid<UIEntryItem>
-		{
+		gridEntryItems = new UIGrid<UIEntryItem> {
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48),
 			Settings = { ItemMargin = 8 }
 		};
 
-		BaseElement pageRight = new()
-		{
+		BaseElement pageRight = new() {
 			Size = Dimension.FromPixels(420, 670),
-			Position = Dimension.FromPercent(100, 0), Children =
-			{
+			Position = Dimension.FromPercent(100, 0), Children = {
 				textEntryName,
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1"))
-				{
+				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
 					Size = new Dimension(0, 4, 100, 0),
 					Position = Dimension.FromPixels(0, 38),
 					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
@@ -93,16 +81,15 @@ public class UIPageCategory : BaseElement
 		gridEntries.Clear();
 		foreach (BookEntry entry in category.Items)
 		{
-			UIBookEntry uiBookEntry = new(entry) { Size = new Dimension(0, 64, 100, 0) };
-			uiBookEntry.OnClick += args =>
-			{
+			UIBookEntry uiBookEntry = new(entry);
+			uiBookEntry.OnClick += args => {
 				textEntryName.Text = entry.DisplayName;
 
 				gridEntryItems.Clear();
 
 				foreach (BookEntryItem entryItem in entry.Items)
 				{
-					UIEntryItem item = new(entryItem) { Size = new Dimension(0, 20, 100, 0) };
+					UIEntryItem item = new(entryItem);
 					gridEntryItems.Add(item);
 				}
 

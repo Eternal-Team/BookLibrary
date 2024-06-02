@@ -3,8 +3,6 @@ using BaseLibrary.UI;
 using BookLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace BookLibrary;
@@ -14,53 +12,42 @@ public class PortableStorageBook : ModBook
 	public override void SetStaticDefaults()
 	{
 		BookCategory bookCategory = new() { Name = "Items" };
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "NormalsBags",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "AmmoPouch",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "DartHolder",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "FireproofContainer",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "Magazine",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "ThePerfectSolution",
 			Mod = this
 		});
-		bookCategory.Items.Add(new BookEntry
-		{
+		bookCategory.Items.Add(new BookEntry {
 			Name = "Wallet",
 			Mod = this
 		});
 		AddCategory(bookCategory);
-		AddCategory(new BookCategory
-		{
+		AddCategory(new BookCategory {
 			Name = "Mechanics",
-			Items =
-			{
-				new BookEntry
-				{
+			Items = {
+				new BookEntry {
 					Name = "Crafting",
 					Mod = this,
-					Items =
-					{
+					Items = {
 						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
 						new BookEntryItem_Image(BaseLibrary.BaseLibrary.PlaceholderTexture),
 						new BookEntryItem_Text("\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""),
@@ -85,51 +72,6 @@ public class OtherBook : ModBook
 			AddCategory(new BookCategory { Name = "Items" + i });
 		}
 	}
-}
-
-public class BookCategory
-{
-	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Category.{Name}");
-
-	public List<BookEntry> Items = [];
-	public ModBook Mod;
-	public string Name;
-	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
-}
-
-public class BookEntry
-{
-	public virtual LocalizedText DisplayName => Mod.GetLocalization($"Entry.{Name}");
-	public ModBook Mod;
-
-	public List<BookEntryItem> Items = [];
-	public string Name;
-	public string Texture = BaseLibrary.BaseLibrary.PlaceholderTexture;
-}
-
-public abstract class BookEntryItem
-{
-}
-
-public class BookEntryItem_Text(string text) : BookEntryItem
-{
-	public readonly string Text = text;
-}
-
-public class BookEntryItem_Image(string path) : BookEntryItem
-{
-	public readonly string Path = path;
-}
-
-public class BookEntryItem_Video(string path) : BookEntryItem
-{
-	public readonly string Path = path;
-}
-
-// NOTE: this might be problematic, how do you select the right recipe? (mainly a problem if books are generated from files)
-public class BookEntryItem_Recipe(Recipe recipe) : BookEntryItem
-{
-	public readonly Recipe Recipe = recipe;
 }
 
 // TODO: SFX
@@ -162,14 +104,12 @@ public class BookUI : UIPanel
 		Display = Display.None;
 		Settings.Texture = ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/BookBackground");
 
-		UITexture textureReturn = new(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/ReturnButton"))
-		{
+		UITexture textureReturn = new(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/ReturnButton")) {
 			Size = Dimension.FromPixels(30),
 			Position = Dimension.FromPixels(28, 12),
 			Settings = { ScaleMode = ScaleMode.Stretch, SamplerState = SamplerState.PointClamp }
 		};
-		textureReturn.OnMouseDown += args =>
-		{
+		textureReturn.OnMouseDown += args => {
 			if (lastPages.TryPop(out BaseElement? element))
 			{
 				element.Display = Display.Visible;
@@ -186,23 +126,20 @@ public class BookUI : UIPanel
 		};
 		base.Add(textureReturn);
 
-		currentElement = uiMain = new UIPageMain
-		{
+		currentElement = uiMain = new UIPageMain {
 			Size = WrapperSize,
 			Position = WrapperPosition,
 		};
 		base.Add(uiMain);
 
-		uiBook = new UIPageBook
-		{
+		uiBook = new UIPageBook {
 			Size = WrapperSize,
 			Position = WrapperPosition,
 			Display = Display.None
 		};
 		base.Add(uiBook);
 
-		uiCategory = new UIPageCategory
-		{
+		uiCategory = new UIPageCategory {
 			Size = WrapperSize,
 			Position = WrapperPosition,
 			Display = Display.None
