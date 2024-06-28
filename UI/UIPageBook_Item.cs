@@ -16,7 +16,7 @@ public class UIBookCategory : UIPanel
 		this.category = category;
 
 		Settings.BorderColor = Color.Transparent;
-		Settings.BackgroundColor = new Color(0, 0, 0, 100);
+		Settings.BackgroundColor = new Color(50, 50, 50, 100);
 
 		icon = new UITexture(ModContent.Request<Texture2D>(this.category.Texture)) {
 			Settings = { ScaleMode = ScaleMode.Stretch }

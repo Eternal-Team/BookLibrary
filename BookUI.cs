@@ -63,23 +63,6 @@ public class PortableStorageBook : ModBook
 	}
 }
 
-public class OtherBook : ModBook
-{
-	public override void SetStaticDefaults()
-	{
-		for (int i = 0; i < 20; i++)
-		{
-			AddCategory(new BookCategory { Name = "Items" + i });
-		}
-	}
-}
-
-// TODO: SFX
-// TODO: Different font
-// TODO: hovering animations
-// TODO: video support - 'Xna.VideoPlayer' https://rbwhitaker.com/tutorials/xna/advanced/video-playback/
-// https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Core/VideoPlayback/OgvReader.cs
-// https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Core/Interface/UIVideo.cs
 public class BookUI : UIPanel
 {
 	public static BookUI Instance = null!;
@@ -147,11 +130,12 @@ public class BookUI : UIPanel
 		base.Add(uiCategory);
 	}
 
-	public void PushPage(BaseElement element)
+	public void PushPage(UIBookPage element)
 	{
 		currentElement.Display = Display.None;
 		element.Display = Display.Visible;
-
+		element.OpenPage();
+        
 		lastPages.Push(currentElement);
 		currentElement = element;
 	}

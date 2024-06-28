@@ -17,7 +17,7 @@ public class UIBookEntry : UIPanel
 
 		Size = new Dimension(0, 64, 100, 0);
 		Settings.BorderColor = Color.Transparent;
-		Settings.BackgroundColor = new Color(0, 0, 0, 100);
+		Settings.BackgroundColor = new Color(50, 50, 50, 100);
 
 		icon = new UITexture(ModContent.Request<Texture2D>(this.entry.Texture)) {
 			Settings = { ScaleMode = ScaleMode.Stretch }

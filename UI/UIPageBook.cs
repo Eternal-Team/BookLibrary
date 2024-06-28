@@ -7,8 +7,32 @@ using Terraria.ModLoader;
 
 namespace BookLibrary.UI;
 
-// Note: right side could be used for mod description
-public class UIPageBook : BaseElement
+public class UIBookPage : BaseElement
+{
+	protected BaseElement pageLeft;
+	protected BaseElement pageRight;
+
+	public UIBookPage()
+	{
+		pageLeft = new BaseElement {
+			Size = Dimension.FromPixels(420, 685)
+		};
+		base.Add(pageLeft);
+
+		pageRight = new BaseElement {
+			Size = Dimension.FromPixels(420, 670),
+			Position = Dimension.FromPercent(100, 0)
+		};
+		base.Add(pageRight);
+	}
+
+	public virtual void OpenPage()
+	{
+		
+	}
+}
+
+public class UIPageBook : UIBookPage
 {
 	private readonly UIText textBookName;
 	private readonly UIGrid<UIBookCategory> grid;
@@ -29,19 +53,13 @@ public class UIPageBook : BaseElement
 			Position = Dimension.FromPixels(0, 48)
 		};
 
-		BaseElement pageLeft = new() {
-			Size = Dimension.FromPixels(420, 685),
-			Children = {
-				textBookName,
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
-					Size = new Dimension(0, 4, 100, 0),
-					Position = Dimension.FromPixels(0, 38),
-					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
-				},
-				grid
-			}
-		};
-		base.Add(pageLeft);
+		pageLeft.Add(textBookName);
+		pageLeft.Add(new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
+			Size = new Dimension(0, 4, 100, 0),
+			Position = Dimension.FromPixels(0, 38),
+			Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
+		});
+		pageLeft.Add(grid);
 	}
 
 	public void SetBook(ModBook book)

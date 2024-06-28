@@ -6,47 +6,35 @@ using Terraria.ModLoader;
 
 namespace BookLibrary.UI;
 
-public class UIPageMain : BaseElement
+public class UIPageMain : UIPageBook
 {
 	public UIPageMain()
 	{
-		BaseElement pageLeft = new() {
-			Size = Dimension.FromPixels(420, 685),
-			Children = {
-				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookName"), 1.1f) {
-					Size = new Dimension(0, 30, 100, 0),
-					Settings = {
-						HorizontalAlignment = HorizontalAlignment.Center,
-						TextColor = BookUI.TextColor,
-						BorderColor = Color.Transparent
-					}
-				},
-				new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
-					Size = new Dimension(0, 4, 100, 0),
-					Position = Dimension.FromPixels(0, 38),
-					Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
-				}
+		pageLeft.Add(new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookName"), 1.1f) {
+			Size = new Dimension(0, 30, 100, 0),
+			Settings = {
+				HorizontalAlignment = HorizontalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
 			}
-		};
-		base.Add(pageLeft);
+		});
+		
+		pageLeft.Add(new UITexture(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1")) {
+			Size = new Dimension(0, 4, 100, 0),
+			Position = Dimension.FromPixels(0, 38),
+			Settings = { ScaleMode = ScaleMode.Stretch, Color = new Color(138, 89, 45) }
+		});
 
-		BaseElement pageRight = new() {
-			Size = Dimension.FromPixels(420, 670),
-			Position = Dimension.FromPercent(100, 0),
-			Children = {
-				new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookDescription")) {
-					Size = new Dimension(0, -40, 100, 100),
-					Position = Dimension.FromPixels(0, 40),
-					Settings = {
-						HorizontalAlignment = HorizontalAlignment.Center,
-						VerticalAlignment = VerticalAlignment.Center,
-						TextColor = BookUI.TextColor,
-						BorderColor = Color.Transparent
-					}
-				}
+		pageRight.Add(new UIText(ModContent.GetInstance<BookLibrary>().GetLocalization("UI.BookDescription")) {
+			Size = new Dimension(0, -40, 100, 100),
+			Position = Dimension.FromPixels(0, 40),
+			Settings = {
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Center,
+				TextColor = BookUI.TextColor,
+				BorderColor = Color.Transparent
 			}
-		};
-		base.Add(pageRight);
+		});
 
 		UIGrid<UIModBook> grid = new() {
 			Size = new Dimension(0, -48, 100, 100),
