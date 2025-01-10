@@ -28,6 +28,7 @@ public class UIPageCategory : UIPageBook
 		};
 		pageLeft.Add(textCategoryName);
 
+		// TODO: highlight the current selected entry
 		gridEntries = new UIGrid<UIBookEntry> {
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48)

@@ -21,7 +21,12 @@ public class BookItem : BaseItem
 	{
 		if (Main.netMode != NetmodeID.Server && player.whoAmI == Main.LocalPlayer.whoAmI)
 		{
-			BookUI.Instance.Display = BookUI.Instance.Display == Display.Visible ? Display.None : Display.Visible;
+			UISystem.UILayer.Remove(BookUI.Instance);
+			UISystem.UILayer.Add(new BookUI());
+			BookUI.Instance.Display = Display.Visible;
+			
+			// BookUI.Instance = new BookUI();
+			// BookUI.Instance.Display = BookUI.Instance.Display == Display.Visible ? Display.None : Display.Visible;
 			BookUI.Instance.Recalculate();
 		}
 

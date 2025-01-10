@@ -2,10 +2,20 @@ Mods: {
 	BookLibrary: {  
 		UI: {
 			BookName: The One Book
-			BookDescription:
+			ModName: Cognitia
+			ModAuthor: by Itorius
+			ModPatreon: Patreon
+			ModDiscord: Discord
+			ModDescription: 
 			'''
-			The One Book provides information about your favorite mods.
-			Please start by selecting a book on the left page.
+			Cognitia is a mod that provides a unified system for adding in-game wikis.
+			
+			I make mods in my free time (of which I don't have much), so please consider donating on my Patreon.
+			
+			If you want to report any bugs with my mods or just have a conversation please join my Discord server.  
+			
+			You can start by opening a book on the left page. 
+			Thank you.
 			'''
 		},
 		Books: {

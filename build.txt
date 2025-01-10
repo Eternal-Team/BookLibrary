@@ -1,4 +1,4 @@
-displayName = Book Library
+displayName = Cognitia
 author = Itorius & team
 version = 1.0
 homepage = https://terraria.itorius.com/
