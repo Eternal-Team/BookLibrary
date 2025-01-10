@@ -11,7 +11,7 @@ public class BookItem : BaseItem
 	{
 		Item.useTime = 30;
 		Item.useAnimation = 30;
-		Item.useStyle = ItemUseStyleID.Guitar;
+		Item.useStyle = ItemUseStyleID.RaiseLamp;
 		Item.rare = ItemRarityID.White;
 	}
 
@@ -20,7 +20,10 @@ public class BookItem : BaseItem
 	public override bool? UseItem(Player player)
 	{
 		if (Main.netMode != NetmodeID.Server && player.whoAmI == Main.LocalPlayer.whoAmI)
+		{
 			BookUI.Instance.Display = BookUI.Instance.Display == Display.Visible ? Display.None : Display.Visible;
+			BookUI.Instance.Recalculate();
+		}
 
 		return true;
 	}
