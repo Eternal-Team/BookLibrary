@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 
 namespace BookLibrary.UI;
 
+// TODO: have separate entry items for each type
 public class UIEntryItem : BaseElement
 {
 	private readonly BaseElement element = null!;
@@ -34,9 +35,11 @@ public class UIEntryItem : BaseElement
 			case BookEntryItem_Image image:
 			{
 				Asset<Texture2D> texture = ModContent.Request<Texture2D>(image.Path, AssetRequestMode.ImmediateLoad);
-				Size.PixelsY = texture.Height();
+				// Size.PixelsY = texture.Height();
 
-				element = new UITexture(texture) { Size = Dimension.FromPercent(100) };
+				// BUG: this should account for the border (+12px)
+				
+				element = new UIBorderedTexture(texture);
 				base.Add(element);
 
 				break;
@@ -48,7 +51,7 @@ public class UIEntryItem : BaseElement
 	{
 		Size.PixelsY = element switch {
 			UIText text => (int)text.TotalHeight,
-			UITexture texture => texture.Texture?.Height() ?? 20,
+			UITexture texture => texture.Texture?.Height() + 12 ?? 20,
 			_ => Size.PixelsY
 		};
 
