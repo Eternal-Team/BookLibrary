@@ -75,7 +75,7 @@ public class UIPageCategory : UIPageBook
 
 	public void SetCategory(BookCategory category)
 	{
-	textCategoryName.Text = category.DisplayName;
+		textCategoryName.Text = category.DisplayName;
 
 		gridEntries.Clear();
 		foreach (BookEntry entry in category.Items)
@@ -90,8 +90,15 @@ public class UIPageCategory : UIPageBook
 
 				foreach (BookEntryItem entryItem in entry.Items)
 				{
-					UIEntryItem item = new(entryItem);
-					gridEntryItems.Add(item);
+					UIEntryItem? item = entryItem switch {
+						BookEntryItem_Text text => new UIEntryItem_Text(text),
+						BookEntryItem_Image image => new UIEntryItem_Image(image),
+						BookEntryItem_Recipe recipe => new UIEntryItem_Recipe(recipe),
+						_ => null
+					};
+
+					if (item is not null)
+						gridEntryItems.Add(item);
 				}
 
 				args.Handled = true;

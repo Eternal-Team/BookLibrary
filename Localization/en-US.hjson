@@ -27,6 +27,7 @@ Mods: {
 				}
 				Entry: {
 					Crafting: Crafting
+					NormalBags: Normal Bags
 				}
 			},
 			OtherBook: {

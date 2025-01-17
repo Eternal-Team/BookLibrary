@@ -3,6 +3,8 @@ using BaseLibrary.UI;
 using BookLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace BookLibrary;
@@ -11,10 +13,32 @@ public class PortableStorageBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
+		Recipe? zenith = null, cookingpot = null;
+
+		for (int i = 0; i < Recipe.numRecipes; i++)
+		{
+			Recipe recipe = Main.recipe[i];
+
+			if (recipe.HasResult(ItemID.CopperPickaxe))
+			{
+				zenith = recipe;
+			}
+			else if (recipe.HasResult(ItemID.CookingPot))
+			{
+				cookingpot = recipe;
+			}
+		}
+
 		BookCategory bookCategory = new() { Name = "Items" };
 		bookCategory.Items.Add(new BookEntry {
-			Name = "NormalsBags",
-			Mod = this
+			Name = "NormalBags",
+			Mod = this,
+			Items = {
+				new BookEntryItem_Text("Here's a recipe for a cool sword:"),
+				new BookEntryItem_Recipe(zenith),
+				new BookEntryItem_Text("But here is an even cooler recipe, those who own the mighty Cooking Pot can call themselves true Terrarians!"),
+				new BookEntryItem_Recipe(cookingpot)
+			}
 		});
 		bookCategory.Items.Add(new BookEntry {
 			Name = "AmmoPouch",
@@ -135,7 +159,7 @@ public class BookUI : UIPanel
 		currentElement.Display = Display.None;
 		element.Display = Display.Visible;
 		element.OpenPage();
-        
+
 		lastPages.Push(currentElement);
 		currentElement = element;
 	}

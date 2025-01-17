@@ -5,7 +5,5 @@
 - visual improvements - font, hovering animations
 - SFX
 - UIPageBook - right side could be used for mod description
-- UIPageMain - Patreon link
-
-# Code TODO
-- separator prototype
+- NPC display
+- generate from JSON/other format

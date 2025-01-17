@@ -18,7 +18,8 @@ public class UIBorderedTexture : UITexture
 		BorderTexture ??= Main.Assets.Request<Texture2D>("Images/UI/Achievement_Borders");
 
 		Size = Dimension.FromPercent(100);
-		Margin = new Margin(6);
+		// Margin = new Margin(6);
+		Padding = new Padding(6);
 	}
 
 	protected override void Draw(SpriteBatch spriteBatch)
@@ -33,8 +34,8 @@ public class UIBorderedTexture : UITexture
 		Vector2 textureSize = Settings.SourceRectangle?.Size() ?? texture.Size();
 
 		Vector2 scale = Settings.ScaleMode switch {
-			ScaleMode.Stretch => new Vector2(Dimensions.Width / textureSize.X, Dimensions.Height / textureSize.Y),
-			ScaleMode.Zoom => new Vector2(Math.Min(Dimensions.Width / textureSize.X, Dimensions.Height / textureSize.Y)),
+			ScaleMode.Stretch => new Vector2(InnerDimensions.Width / textureSize.X, InnerDimensions.Height / textureSize.Y),
+			ScaleMode.Zoom => new Vector2(Math.Min(InnerDimensions.Width / textureSize.X, InnerDimensions.Height / textureSize.Y)),
 			_ => Vector2.One
 		};
 
@@ -42,8 +43,8 @@ public class UIBorderedTexture : UITexture
 		textureSize *= scale;
 
 		Vector2 position = new() {
-			X = Dimensions.X + Settings.ImagePos.PercentX * Dimensions.Width * 0.01f - Settings.ImagePos.PercentX * (textureSize.X) * 0.01f + Settings.ImagePos.PixelsX,
-			Y = Dimensions.Y + Settings.ImagePos.PercentY * Dimensions.Height * 0.01f - Settings.ImagePos.PercentY * (textureSize.Y) * 0.01f + Settings.ImagePos.PixelsY
+			X = InnerDimensions.X + Settings.ImagePos.PercentX * InnerDimensions.Width * 0.01f - Settings.ImagePos.PercentX * (textureSize.X) * 0.01f + Settings.ImagePos.PixelsX,
+			Y = InnerDimensions.Y + Settings.ImagePos.PercentY * InnerDimensions.Height * 0.01f - Settings.ImagePos.PercentY * (textureSize.Y) * 0.01f + Settings.ImagePos.PixelsY
 		};
 
 		spriteBatch.Draw(texture, position, Settings.SourceRectangle, Settings.Color, Settings.Rotation, Settings.Origin, scale, Settings.SpriteEffects, 0f);
