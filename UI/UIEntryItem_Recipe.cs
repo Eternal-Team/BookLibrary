@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using BaseLibrary;
 using BaseLibrary.Input;
 using BaseLibrary.UI;
@@ -40,13 +41,12 @@ public class UIEntryItem_Recipe : UIEntryItem
 
 	public static Tilemap? Tilemap;
 
-	// TODO: handle recipe groups
 	public unsafe UIEntryItem_Recipe(BookEntryItem_Recipe entry)
 	{
 		if (Tilemap is null)
 		{
 			Tilemap map = new Tilemap();
-			MyStruct myStruct = new MyStruct((ushort)Main.maxTilesX, (ushort)Main.maxTilesY);
+			MyStruct myStruct = new MyStruct(200, 200);
 			Unsafe.Copy(&map, ref myStruct);
 			Tilemap = map;
 		}
@@ -70,19 +70,20 @@ public class UIEntryItem_Recipe : UIEntryItem
 		};
 		base.Add(text);
 
-		for (int i = 0; i < entry.Recipe.requiredTile.Count; i++)
-		{
-			// GetTileDrawData(tileX, tileY, drawData.tileCache, drawData.typeCache, ref drawData.tileFrameX, ref drawData.tileFrameY, out drawData.tileWidth, out drawData.tileHeight, out drawData.tileTop, out drawData.halfBrickHeight, out drawData.addFrX, out drawData.addFrY, out drawData.tileSpriteEffect, out drawData.glowTexture, out drawData.glowSourceRect, out drawData.glowColor);
-			// drawData.drawTexture = GetTileDrawTexture(drawData.tileCache, tileX, tileY);
-			// TileDrawing.DrawSingleTile(value, solidLayer, waterStyleOverride, unscaledPosition, vector, j, i);
+		DoActionOnTilemap(() => {
+			for (int i = 10; i <= 12; i++)
+			{
+				for (int j = 8; j <= 10; j++)
+				{
+					Main.tile[i, j].ClearEverything();
+				}
+			}
 
-			Main.instance.LoadTiles(entry.Recipe.requiredTile[i]);
-			UITexture t = new UITexture(TextureAssets.Tile[entry.Recipe.requiredTile[i]]) {
-				Size = Dimension.FromPixels(40),
-				Position = new Dimension(60, 20, 50, 0)
-			};
-			base.Add(t);
-		}
+			TileObject.CanPlace(11, 10, TileID.Furnaces, 0, 0, out TileObject objectData);
+
+			// objectData.random = random;
+			TileObject.Place(objectData);
+		});
 
 		_items = new UIItem[entry.Recipe.requiredItem.Count];
 		_groups = new GroupData[entry.Recipe.requiredItem.Count];
@@ -116,17 +117,31 @@ public class UIEntryItem_Recipe : UIEntryItem
 		public ushort height = height;
 	}
 
-	private unsafe void DrawSingleTile(TileDrawInfo drawData, bool solidLayer, int waterStyleOverride, Vector2 screenPosition, Vector2 screenOffset)
+	private static void DoActionOnTilemap(Action action)
 	{
-		int tileX = 10;
-		int tileY = 10;
+		// Make sure autosave doesn't run when we are swapping Main.tile
+		bool prevAutosave = Main.skipMenu;
+		Main.skipMenu = true;
 
-		var cache = Main.tile;
+		Tilemap cache = Main.tile;
+		int oldTilesX = Main.maxTilesX;
+		int oldTilesY = Main.maxTilesY;
+		Main.maxTilesX = 200;
+		Main.maxTilesY = 200;
 		Main.tile = Tilemap.Value;
 
-		// TODO: how to handle this?
-		Main.tile[10, 10].ResetToType(TileID.Stone);
-		WorldGen.TileFrame(10, 10);
+		action();
+
+		Main.tile = cache;
+		Main.maxTilesX = oldTilesX;
+		Main.maxTilesY = oldTilesY;
+
+		Main.skipMenu = prevAutosave;
+	}
+
+	private void DrawSingleTile(TileDrawInfo drawData, int tileX, int tileY, bool solidLayer, int waterStyleOverride, Vector2 screenPosition, Vector2 screenOffset)
+	{
+		// TODO: how would modded draw methods work? a flag?
 
 		drawData.tileCache = Main.tile[tileX, tileY];
 		drawData.typeCache = drawData.tileCache.TileType;
@@ -136,15 +151,17 @@ public class UIEntryItem_Recipe : UIEntryItem
 		if (drawData.tileCache.LiquidType > 0 && drawData.tileCache.TileType == TileID.LilyPad)
 			return;
 
+		if (!drawData.tileCache.HasTile)
+			return;
+
 		// TODO: this is gnarly
 		Main.instance.TilesRenderer.GetTileDrawData(tileX, tileY, drawData.tileCache, drawData.typeCache, ref drawData.tileFrameX, ref drawData.tileFrameY, out drawData.tileWidth, out drawData.tileHeight, out drawData.tileTop, out drawData.halfBrickHeight, out drawData.addFrX, out drawData.addFrY, out drawData.tileSpriteEffect, out drawData.glowTexture, out drawData.glowSourceRect, out drawData.glowColor);
-		// drawData.drawTexture = Main.instance.TilesRenderer.GetTileDrawTexture(drawData.tileCache, tileX, tileY);
-		drawData.drawTexture = TextureAssets.Tile[drawData.tileCache.TileType].Value;
+		drawData.drawTexture = Main.instance.TilesRenderer.GetTileDrawTexture(drawData.tileCache, tileX, tileY);
 		Texture2D highlightTexture = null;
 		Rectangle empty = Rectangle.Empty;
 		Color highlightColor = Color.Transparent;
-		// if (TileID.Sets.HasOutlines[drawData.typeCache])
-		// Main.instance.TilesRenderer.GetTileOutlineInfo(tileX, tileY, drawData.typeCache, ref drawData.tileLight, ref highlightTexture, ref highlightColor);
+		if (TileID.Sets.HasOutlines[drawData.typeCache])
+			Main.instance.TilesRenderer.GetTileOutlineInfo(tileX, tileY, drawData.typeCache, ref drawData.tileLight, ref highlightTexture, ref highlightColor);
 
 		// dust code
 		/*
@@ -180,8 +197,6 @@ public class UIEntryItem_Recipe : UIEntryItem
 
 		Rectangle rectangle = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight - drawData.halfBrickHeight);
 		Vector2 normaltilepos = new Vector2((float)(tileX * 16 - (int)screenPosition.X) - ((float)drawData.tileWidth - 16f) / 2f, tileY * 16 - (int)screenPosition.Y + drawData.tileTop + drawData.halfBrickHeight) + screenOffset;
-
-		normaltilepos = Dimensions.TopLeft();
 
 		TileLoader.DrawEffects(tileX, tileY, drawData.typeCache, Main.spriteBatch, ref drawData);
 		// if (!visible)
@@ -468,35 +483,23 @@ public class UIEntryItem_Recipe : UIEntryItem
 		// 	int num20 = 0;
 		// 	Main.spriteBatch.Draw(highlightTexture, new Vector2((float)(tileX * 16 - (int)screenPosition.X) - ((float)drawData.tileWidth - 16f) / 2f + (float)num19, tileY * 16 - (int)screenPosition.Y + drawData.tileTop + num20) + screenOffset, empty, highlightColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
 		// }
-
-		Main.tile = cache;
-		Main.NewText("");
 	}
 
 	protected override unsafe void Draw(SpriteBatch spriteBatch)
 	{
 		base.Draw(spriteBatch);
 
+		DoActionOnTilemap(() => {
+			TileDrawInfo info = new TileDrawInfo();
 
-		// Tilemap map = new Tilemap();
-		// MyStruct myStruct = new MyStruct(100, 100);
-		// Unsafe.Copy(&map, ref myStruct);
-		// Main.tile = map;
-		//
-		// // WorldGen.PlaceObject(50, 50, TileID.Stone);
-		// Main.tile[50,50].ResetToType(TileID.Stone);
-		TileDrawInfo info = new TileDrawInfo();
-		DrawSingleTile(info, false, -1, -Dimensions.TopLeft(), Vector2.Zero);
-
-		// Main.instance.TilesRenderer.Draw(false, false,);
-
-		// Vector2 vector2 = -Dimensions.TopLeft() + new Vector2(50*16f);
-		// typeof(TileDrawing).GetMethod("DrawSingleTile", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(Main.instance.TilesRenderer, new object[] { info, false, -1, vector2, Vector2.Zero, 50, 50 });
-		// (TileDrawInfo drawData, bool solidLayer, int waterStyleOverride, Vector2 screenPosition, Vector2 screenOffset, int tileX, int tileY)
-
-		// Main.instance.TilesRenderer.DrawSingleTile();
-
-		// Main.tile = cache;
+			for (int i = 7; i <= 10; i++)
+			{
+				for (int j = 10; j <= 12; j++)
+				{
+					DrawSingleTile(info, j, i, false, -1, -Dimensions.TopLeft(), Vector2.Zero);
+				}
+			}
+		});
 	}
 
 	protected override void Update(GameTime gameTime)

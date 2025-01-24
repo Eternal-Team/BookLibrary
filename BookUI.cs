@@ -36,8 +36,8 @@ public class PortableStorageBook : ModBook
 			Items = {
 				new BookEntryItem_Text("Here's a recipe for a cool sword:"),
 				new BookEntryItem_Recipe(zenith),
-				new BookEntryItem_Text("But here is an even cooler recipe, those who own the mighty Cooking Pot can call themselves true Terrarians!"),
-				new BookEntryItem_Recipe(cookingpot)
+				// new BookEntryItem_Text("But here is an even cooler recipe, those who own the mighty Cooking Pot can call themselves true Terrarians!"),
+				// new BookEntryItem_Recipe(cookingpot)
 			}
 		});
 		bookCategory.Items.Add(new BookEntry {
