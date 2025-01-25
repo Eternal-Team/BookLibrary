@@ -19,8 +19,8 @@ Mods: {
 			'''
 		},
 		Books: {
-			PortableStorageBook: {
-				Name: Portable Storage
+			BookTestBook: {
+				Name: Test Book
 				Category: {
 					Items: Items
 					Mechanics: Mechanics
@@ -29,9 +29,6 @@ Mods: {
 					Crafting: Crafting
 					NormalBags: Normal Bags
 				}
-			},
-			OtherBook: {
-				Name: Other Book
 			}
 		},
 		Items: {
