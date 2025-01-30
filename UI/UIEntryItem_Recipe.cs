@@ -24,6 +24,9 @@ namespace BookLibrary.UI;
 
 public class UIEntryItem_Recipe : UIEntryItem
 {
+	private const ushort WorldWidth = 200;
+	private const ushort WorldHeight = 200;
+
 	private struct GroupData
 	{
 		public GroupData(int group = -1)
@@ -46,8 +49,8 @@ public class UIEntryItem_Recipe : UIEntryItem
 		if (Tilemap is null)
 		{
 			Tilemap map = new Tilemap();
-			MyStruct myStruct = new MyStruct(200, 200);
-			Unsafe.Copy(&map, ref myStruct);
+			uint data = WorldWidth | WorldHeight << 16;
+			Unsafe.Copy(&map, ref data);
 			Tilemap = map;
 		}
 
@@ -110,12 +113,6 @@ public class UIEntryItem_Recipe : UIEntryItem
 	private const int SlotSize = 52;
 
 	private int ticks = 0;
-
-	private struct MyStruct(ushort width, ushort height)
-	{
-		public ushort width = width;
-		public ushort height = height;
-	}
 
 	private static void DoActionOnTilemap(Action action)
 	{
