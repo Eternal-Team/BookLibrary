@@ -95,12 +95,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 		{
 			Item item = entry.Recipe.requiredItem[i];
 
-			_groups[i] = new GroupData(-1);
-			foreach (int num in _recipe.acceptedGroups.Where(num => RecipeGroup.recipeGroups[num].ContainsItem(item.type)))
-			{
-				_groups[i] = new GroupData(num);
-				break;
-			}
+			_groups[i] = new GroupData(_recipe.acceptedGroups.FirstOrDefault(groupID => RecipeGroup.recipeGroups[groupID].ContainsItem(item.type), -1));
 
 			UIItem ingredient = new UIItem(item) {
 				Size = Dimension.FromPixels(36 + 12)
