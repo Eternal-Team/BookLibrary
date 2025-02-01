@@ -94,6 +94,7 @@ public class UIPageCategory : UIPageBook
 						BookEntryItem_Text text => new UIEntryItem_Text(text),
 						BookEntryItem_Image image => new UIEntryItem_Image(image),
 						BookEntryItem_Recipe recipe => new UIEntryItem_Recipe(recipe),
+						BookEntryItem_Video video => new UIEntryItem_Video(video),
 						_ => null
 					};
 

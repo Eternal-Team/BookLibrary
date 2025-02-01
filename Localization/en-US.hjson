@@ -22,12 +22,11 @@ Mods: {
 			BookTestBook: {
 				Name: Test Book
 				Category: {
-					Items: Items
-					Mechanics: Mechanics
+					Tests: Tests
 				}
 				Entry: {
-					Crafting: Crafting
-					NormalBags: Normal Bags
+					RecipeTest: Recipe Test
+					VideoTest: Video Test
 				}
 			}
 		},

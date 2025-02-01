@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading;
-using BaseLibrary;
 using BaseLibrary.Input;
 using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
@@ -15,10 +11,8 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
-using Terraria.GameContent.Liquid;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.Utilities;
 
 namespace BookLibrary.UI;
 
@@ -27,22 +21,17 @@ public class UIEntryItem_Recipe : UIEntryItem
 	private const ushort WorldWidth = 200;
 	private const ushort WorldHeight = 200;
 
-	private struct GroupData
+	private struct GroupData(int group)
 	{
-		public GroupData(int group = -1)
-		{
-			this.group = group;
-		}
-
-		public int group;
+		public int group = group;
 		public int currentItem;
 	}
 
-	private Recipe _recipe;
-	private UIItem[] _items;
-	private GroupData[] _groups;
+	private Recipe recipe;
+	private readonly UIItem[] items;
+	private readonly GroupData[] groups;
 
-	public static Tilemap? Tilemap;
+	private static Tilemap? Tilemap;
 
 	public unsafe UIEntryItem_Recipe(BookEntryItem_Recipe entry)
 	{
@@ -54,7 +43,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 			Tilemap = map;
 		}
 
-		_recipe = entry.Recipe;
+		recipe = entry.Recipe;
 
 		UIItem result = new UIItem(entry.Recipe.createItem) {
 			Size = Dimension.FromPixels(62),
@@ -88,19 +77,19 @@ public class UIEntryItem_Recipe : UIEntryItem
 			TileObject.Place(objectData);
 		});
 
-		_items = new UIItem[entry.Recipe.requiredItem.Count];
-		_groups = new GroupData[entry.Recipe.requiredItem.Count];
+		items = new UIItem[entry.Recipe.requiredItem.Count];
+		groups = new GroupData[entry.Recipe.requiredItem.Count];
 
 		for (int i = 0; i < entry.Recipe.requiredItem.Count; i++)
 		{
 			Item item = entry.Recipe.requiredItem[i];
 
-			_groups[i] = new GroupData(_recipe.acceptedGroups.FirstOrDefault(groupID => RecipeGroup.recipeGroups[groupID].ContainsItem(item.type), -1));
+			groups[i] = new GroupData(recipe.acceptedGroups.FirstOrDefault(groupID => RecipeGroup.recipeGroups[groupID].ContainsItem(item.type), -1));
 
 			UIItem ingredient = new UIItem(item) {
 				Size = Dimension.FromPixels(36 + 12)
 			};
-			_items[i] = ingredient;
+			items[i] = ingredient;
 			base.Add(ingredient);
 		}
 	}
@@ -477,7 +466,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 		// }
 	}
 
-	protected override unsafe void Draw(SpriteBatch spriteBatch)
+	protected override void Draw(SpriteBatch spriteBatch)
 	{
 		base.Draw(spriteBatch);
 
@@ -488,7 +477,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 			{
 				for (int j = 10; j <= 12; j++)
 				{
-					DrawSingleTile(info, j, i, false, -1, -Dimensions.TopLeft(), Vector2.Zero);
+					DrawSingleTile(info, j, i, false, -1, -Dimensions.TopLeft().Floor(), Vector2.Zero);
 				}
 			}
 		});
@@ -500,15 +489,15 @@ public class UIEntryItem_Recipe : UIEntryItem
 		{
 			ticks = 0;
 
-			for (int i = 0; i < _groups.Length; i++)
+			for (int i = 0; i < groups.Length; i++)
 			{
-				ref GroupData data = ref _groups[i];
+				ref GroupData data = ref groups[i];
 				if (data.group == -1) continue;
 
 				if (++data.currentItem >= RecipeGroup.recipeGroups[data.group].ValidItems.Count)
 					data.currentItem = 0;
 
-				_items[i].Item = new Item(RecipeGroup.recipeGroups[data.group].ValidItems.ElementAt(data.currentItem)) { stack = _items[i].Item.stack };
+				items[i].Item = new Item(RecipeGroup.recipeGroups[data.group].ValidItems.ElementAt(data.currentItem)) { stack = items[i].Item.stack };
 			}
 		}
 
@@ -520,8 +509,8 @@ public class UIEntryItem_Recipe : UIEntryItem
 		int slotsize = 36 + 12;
 
 		int numPerRow = (int)Math.Floor(InnerDimensions.Width / (float)slotsize) - 1;
-		int rows = (int)Math.Ceiling(_items.Length / (float)numPerRow);
-		int toRender = _items.Length;
+		int rows = (int)Math.Ceiling(items.Length / (float)numPerRow);
+		int toRender = items.Length;
 		int center = InnerDimensions.Width / 2;
 
 		int num = 0;
@@ -533,7 +522,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 			{
 				toRender--;
 
-				UIItem item = _items[row * numPerRow + i];
+				UIItem item = items[row * numPerRow + i];
 				item.Position.PixelsX = center - width / 2 + i * (slotsize + 8);
 				item.Position.PixelsY = 76 + row * (slotsize + 8);
 				item.Recalculate();
