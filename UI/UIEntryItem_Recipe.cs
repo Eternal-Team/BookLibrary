@@ -100,7 +100,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 
 	private static void DoActionOnTilemap(Action action)
 	{
-		// Make sure autosave doesn't run when we are swapping Main.tile
+		// BUG: seems like this isn't enough to stop world saving, might have to hook SaveWorld
 		bool prevAutosave = Main.skipMenu;
 		Main.skipMenu = true;
 
@@ -136,7 +136,7 @@ public class UIEntryItem_Recipe : UIEntryItem
 			return;
 
 		// TODO: this is gnarly
-		Main.instance.TilesRenderer.GetTileDrawData(tileX, tileY, drawData.tileCache, drawData.typeCache, ref drawData.tileFrameX, ref drawData.tileFrameY, out drawData.tileWidth, out drawData.tileHeight, out drawData.tileTop, out drawData.halfBrickHeight, out drawData.addFrX, out drawData.addFrY, out drawData.tileSpriteEffect, out drawData.glowTexture, out drawData.glowSourceRect, out drawData.glowColor);
+			Main.instance.TilesRenderer.GetTileDrawData(tileX, tileY, drawData.tileCache, drawData.typeCache, ref drawData.tileFrameX, ref drawData.tileFrameY, out drawData.tileWidth, out drawData.tileHeight, out drawData.tileTop, out drawData.halfBrickHeight, out drawData.addFrX, out drawData.addFrY, out drawData.tileSpriteEffect, out drawData.glowTexture, out drawData.glowSourceRect, out drawData.glowColor);
 		drawData.drawTexture = Main.instance.TilesRenderer.GetTileDrawTexture(drawData.tileCache, tileX, tileY);
 		Texture2D highlightTexture = null;
 		Rectangle empty = Rectangle.Empty;

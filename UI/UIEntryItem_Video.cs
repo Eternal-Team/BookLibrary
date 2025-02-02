@@ -21,7 +21,11 @@ public class UIEntryItem_Video : UIEntryItem
 
 	public override void Recalculate()
 	{
-		Size.PixelsY = video.Dimensions.Y;
+		Size.PercentX = 0;
+		Size.PercentY = 0;
+
+		Size.PixelsX = video.Dimensions.Width;
+		Size.PixelsY = video.Dimensions.Height;
 
 		base.Recalculate();
 	}

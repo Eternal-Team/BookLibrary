@@ -54,7 +54,10 @@ public class UIPageCategory : UIPageBook
 		gridEntryItems = new UIGrid<UIEntryItem> {
 			Size = new Dimension(0, -48, 100, 100),
 			Position = Dimension.FromPixels(0, 48),
-			Settings = { ItemMargin = 8 }
+			Settings = {
+				ItemMargin = 8,
+				ItemAlignment = HorizontalAlignment.Center
+			}
 		};
 		pageRight.Add(gridEntryItems);
 
