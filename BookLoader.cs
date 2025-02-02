@@ -31,7 +31,7 @@ public abstract class ModBook : ModType, ILocalizedModType
 		Categories.Add(category);
 	}
 
-	protected sealed override void Register()
+	public sealed override void Register()
 	{
 		ModTypeLookup<ModBook>.Register(this);
 		BookLoader.Register(this);

@@ -14,6 +14,7 @@ public class BookLibrary : Mod
 
 		if (!Main.dedServ)
 		{
+			CustomTileRenderer.Load();
 			UISystem.UILayer.Add(new BookUI());
 		}
 	}
