@@ -25,6 +25,7 @@ Mods: {
 					Tests: Tests
 				}
 				Entry: {
+					ImageTest: Image Test
 					RecipeTest: Recipe Test
 					VideoTest: Video Test
 				}
