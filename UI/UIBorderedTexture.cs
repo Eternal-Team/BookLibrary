@@ -9,11 +9,26 @@ using Terraria.GameContent;
 
 namespace BookLibrary.UI;
 
-public class UIBorderedTexture : UITexture
+public class UIBorderedTexture(Asset<Texture2D>? texture) : BaseElement
 {
-	public UIBorderedTexture(Asset<Texture2D>? texture2) : base(texture2)
+	public UITextureSettings Settings = UITextureSettings.Default;
+
+	protected Texture2D Texture => texture is null ? BaseLibrary.BaseLibrary.MissingTexture.Value : texture.Value;
+
+	public override void Recalculate()
 	{
-		Padding = new Padding(6);
+		if (Settings.ResizeToContent)
+		{
+			Size.PercentX = 0;
+			Size.PercentY = 0;
+
+			Size.PixelsX = Texture.Width + 12;
+			Size.PixelsY = Texture.Height + 12;
+
+			Padding = new Padding(6);
+		}
+
+		base.Recalculate();
 	}
 
 	protected override void Draw(SpriteBatch spriteBatch)
@@ -27,7 +42,8 @@ public class UIBorderedTexture : UITexture
 
 		Vector2 textureSize = Settings.SourceRectangle?.Size() ?? Texture.Size();
 
-		Vector2 scale = Settings.ScaleMode switch {
+		Vector2 scale = Settings.ScaleMode switch
+		{
 			ScaleMode.Stretch => new Vector2(InnerDimensions.Width / textureSize.X, InnerDimensions.Height / textureSize.Y),
 			ScaleMode.Zoom => new Vector2(Math.Min(InnerDimensions.Width / textureSize.X, InnerDimensions.Height / textureSize.Y)),
 			_ => Vector2.One
@@ -36,7 +52,8 @@ public class UIBorderedTexture : UITexture
 		scale *= Settings.Scale;
 		textureSize *= scale;
 
-		Vector2 position = new Vector2 {
+		Vector2 position = new Vector2
+		{
 			X = InnerDimensions.X + Settings.ImagePos.PercentX * InnerDimensions.Width * 0.01f - Settings.ImagePos.PercentX * textureSize.X * 0.01f + Settings.ImagePos.PixelsX,
 			Y = InnerDimensions.Y + Settings.ImagePos.PercentY * InnerDimensions.Height * 0.01f - Settings.ImagePos.PercentY * textureSize.Y * 0.01f + Settings.ImagePos.PixelsY
 		};
