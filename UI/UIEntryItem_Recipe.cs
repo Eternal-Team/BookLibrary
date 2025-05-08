@@ -94,10 +94,12 @@ public class UIEntryItem_Recipe : UIEntryItem
 				ref GroupData data = ref groups[i];
 				if (data.group == -1) continue;
 
-				if (++data.currentIndex >= RecipeGroup.recipeGroups[data.group].ValidItems.Count)
+				RecipeGroup recipeGroup = RecipeGroup.recipeGroups[data.group];
+				if (++data.currentIndex >= recipeGroup.ValidItems.Count)
 					data.currentIndex = 0;
 
-				items[i].Item = new Item(RecipeGroup.recipeGroups[data.group].ValidItems.ElementAt(data.currentIndex)) { stack = items[i].Item.stack };
+				items[i].Item = new Item(recipeGroup.ValidItems.ElementAt(data.currentIndex)) { stack = items[i].Item.stack };
+				items[i].Item.SetNameOverride(recipeGroup.GetText());
 			}
 		}
 
