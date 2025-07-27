@@ -42,5 +42,17 @@ Mods: {
 					'''
 			}
 		}
+
+		Configs: {
+			BookLibraryConfig: {
+				DisplayName: Cognitia Config
+				Headers.UI: UI
+
+				RecipeTileRendering: {
+					Label: (Experimental) Recipe Tile Rendering
+					Tooltip: Use a proper tile renderer to draw required crafting stations for a recipe
+				}
+			}
+		}
 	}
 }

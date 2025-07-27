@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,6 +9,8 @@ using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
 using Terraria.GameContent.Liquid;
 using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
 namespace BookLibrary;
@@ -73,6 +76,9 @@ internal static class CustomTileRenderer
 		if (TileID.Sets.HasOutlines[drawData.typeCache])
 			Main.instance.TilesRenderer.GetTileOutlineInfo(tileX, tileY, drawData.typeCache, ref drawData.tileLight, ref highlightTexture, ref highlightColor);
 
+		Main.instance.TilesRenderer.CacheSpecialDraws_Part1(tileX, tileY, drawData.typeCache, drawData.tileFrameX, drawData.tileFrameY, false);
+		Main.instance.TilesRenderer.CacheSpecialDraws_Part2(tileX, tileY, drawData, false);
+		
 		if (drawData is { typeCache: TileID.MushroomTrees, tileFrameX: >= 36 })
 		{
 			int num4 = drawData.tileFrameY switch {
@@ -365,7 +371,8 @@ internal static class CustomTileRenderer
 		}
 	}
 
-	public static void PlaceAndDrawTile(SpriteBatch spriteBatch, int tileID, Vector2 position)
+	// NOTE: some tile types just don't work because Terraria is stupid
+	public static void PlaceAndDrawTile(SpriteBatch spriteBatch, int tileID, Vector2 position, out Vector2 size)
 	{
 		for (int x = 5; x <= 25; x++)
 		{
@@ -375,21 +382,39 @@ internal static class CustomTileRenderer
 			}
 		}
 
-		TileObject.CanPlace(15, 15, tileID, 0, 0, out TileObject objectData);
-		TileObject.Place(objectData);
+		const int baseX = 5, baseY = 5;
 
 		TileObjectData? data = TileObjectData.GetTileData(tileID, 0);
-		if (data == null) return;
-
-		Point16 topLeft = new Point16(15) - data.Origin;
-
-		for (int y = topLeft.Y; y < topLeft.Y + data.Height; y++)
+		if (data == null)
 		{
-			for (int x = topLeft.X; x < topLeft.X + data.Width; x++)
-			{
-				if (!Main.tile[x, y].HasTile) continue;
+			WorldGen.PlaceTile(baseX, baseY, tileID, true, true, -1, 0);
+			WorldGen.PlaceTile(baseX + 1, baseY, tileID, true, true, -1, 0);
+			WorldGen.PlaceTile(baseX + 1, baseY + 1, tileID, true, true, -1, 0);
+			WorldGen.PlaceTile(0, baseY + 1, tileID, true, true, -1, 0);
 
-				switch (Main.tile[x, y].TileType)
+			size = new Vector2(32f);
+		}
+		else
+		{
+			TileObject.CanPlace(baseX + data.Origin.X, baseY + data.Origin.Y, tileID, 0, 0, out TileObject objectData);
+			TileObject.Place(objectData);
+
+			size = new Vector2(data.Width * 16f, data.Height * 16f);
+		}
+
+		Point16 topLeft = new Point16(baseX, baseY);
+
+		for (int y = topLeft.Y; y < topLeft.Y + (data?.Height ?? 2); y++)
+		{
+			for (int x = topLeft.X; x < topLeft.X + (data?.Width ?? 2); x++)
+			{
+				Tile tile = Main.tile[x, y];
+				if (!tile.HasTile) continue;
+
+				if (!TileLoader.PreDraw(x, y, tile.type, Main.spriteBatch))
+					goto PostDraw;
+
+				switch (tile.TileType)
 				{
 					case 52:
 					case 62:
@@ -527,7 +552,12 @@ internal static class CustomTileRenderer
 				}
 
 				DrawSingleTile(tileDrawInfo, x, y, topLeft.ToVector2() * 16f - position * Main.UIScale, Vector2.Zero);
+
+				PostDraw:
+				TileLoader.PostDraw(x, y, tile.type, Main.spriteBatch);
 			}
 		}
+		
+		Main.instance.TilesRenderer.DrawSpecialTilesLegacy(topLeft.ToVector2() * 16f - position * Main.UIScale, Vector2.Zero);
 	}
 }

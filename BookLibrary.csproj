@@ -15,7 +15,7 @@
 	
 	<ItemGroup>
 		<Publicize Include="tModLoader" />
-		<Publicize Include="Terraria" />
+		<DoNotPublicize Include="tModLoader:Terraria.Main.OnResolutionChanged" />
 	</ItemGroup>
 	
 	<Import Project="..\Mods.targets"/>

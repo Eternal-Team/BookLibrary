@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 
 namespace BookLibrary;
 
+// BUG: scroll doesn't get blocked outside of left/right page panels
 public class BookUI : UIPanel
 {
 	public static BookUI Instance = null!;

@@ -14,22 +14,31 @@ public class UIEntryItem_Recipe : UIEntryItem
 {
 	private struct GroupData(int group)
 	{
-		public int group = group;
-		public int currentIndex;
+		public readonly int Group = group;
+		public int CurrentIndex;
 	}
 
 	private const int SlotSize = 48;
 
-	private Recipe recipe;
 	private readonly UIItem[] items;
 	private readonly GroupData[] groups;
+	private readonly ScreenTarget? target;
+
+	private Recipe recipe;
 	private int groupAnimationTimer;
+	private UIItem result;
+
+	// NOTE: maybe fallback to drawing the item if tile rendering fails
+	// NOTE: (?) show if player has the required items
+	// TODO: quantity location is too bottom-right for result
+	// TODO: result should be larger (icon not slot)
+	// TODO: rethink the position of UI elements (see https://discord.com/channels/103110554649894912/711551818194485259/1397871375661928448)
 
 	public UIEntryItem_Recipe(BookEntryItem_Recipe entry)
 	{
 		recipe = entry.Recipe;
 
-		UIItem result = new UIItem(entry.Recipe.createItem) {
+		result = new UIItem(entry.Recipe.createItem) {
 			Size = Dimension.FromPixels(62),
 			Position = new Dimension(0, 6, 50, 0)
 		};
@@ -61,30 +70,41 @@ public class UIEntryItem_Recipe : UIEntryItem
 			items[i] = ingredient;
 			base.Add(ingredient);
 		}
+
+		if (recipe.requiredTile.Count > 0)
+		{
+			// TODO: only render if the recipe is visible
+			target = new ScreenTarget(sb => {
+				Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+				sb.End();
+				sb.Begin();
+
+				CustomTileRenderer.PerformAction(() => {
+					float offset = 0f;
+					foreach (int tileID in recipe.requiredTile)
+					{
+						CustomTileRenderer.PlaceAndDrawTile(sb, tileID, new Vector2(offset, 0f), out Vector2 size);
+						offset += size.X + 16f;
+					}
+				});
+			}, () => true, 0f, _ => new Vector2(256f));
+		}
 	}
 
 	protected override void Draw(SpriteBatch spriteBatch)
 	{
 		base.Draw(spriteBatch);
 
-		spriteBatch.End();
-		spriteBatch.Begin();
-
-		CustomTileRenderer.PerformAction(() => {
-			CustomTileRenderer.PlaceAndDrawTile(spriteBatch, TileID.DemonAltar, InnerDimensions.TopLeft());
-			CustomTileRenderer.PlaceAndDrawTile(spriteBatch, TileID.Furnaces, InnerDimensions.TopLeft() + new Vector2(0f, 40f));
-			CustomTileRenderer.PlaceAndDrawTile(spriteBatch, TileID.LifeFruit, InnerDimensions.TopLeft() + new Vector2(0f, 80f));
-		});
-
-		spriteBatch.End();
-
-		RasterizerState rasterizer = new RasterizerState { CullMode = CullMode.None, ScissorTestEnable = true };
-		spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, rasterizer, null, Main.UIScaleMatrix);
+		if (target is not null)
+		{
+			// TODO: resize the result so they are all the same size
+			spriteBatch.Draw(target.RenderTarget, result.OuterDimensions.Right() + new Vector2(32f, 0f), Color.White);
+		}
 	}
 
 	protected override void Update(GameTime gameTime)
 	{
-		// Cycle items in groups
 		if (!KeyboardInput.IsKeyDown(Keys.LeftShift) && ++groupAnimationTimer >= 30)
 		{
 			groupAnimationTimer = 0;
@@ -92,13 +112,13 @@ public class UIEntryItem_Recipe : UIEntryItem
 			for (int i = 0; i < groups.Length; i++)
 			{
 				ref GroupData data = ref groups[i];
-				if (data.group == -1) continue;
+				if (data.Group == -1) continue;
 
-				RecipeGroup recipeGroup = RecipeGroup.recipeGroups[data.group];
-				if (++data.currentIndex >= recipeGroup.ValidItems.Count)
-					data.currentIndex = 0;
+				RecipeGroup recipeGroup = RecipeGroup.recipeGroups[data.Group];
+				if (++data.CurrentIndex >= recipeGroup.ValidItems.Count)
+					data.CurrentIndex = 0;
 
-				items[i].Item = new Item(recipeGroup.ValidItems.ElementAt(data.currentIndex)) { stack = items[i].Item.stack };
+				items[i].Item = new Item(recipeGroup.ValidItems.ElementAt(data.CurrentIndex)) { stack = items[i].Item.stack };
 				items[i].Item.SetNameOverride(recipeGroup.GetText());
 			}
 		}

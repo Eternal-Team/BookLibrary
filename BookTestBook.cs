@@ -7,17 +7,13 @@ public class BookTestBook : ModBook
 {
 	public override void SetStaticDefaults()
 	{
-		Recipe? zenith = null;
-
-		for (int i = 0; i < Recipe.numRecipes; i++)
-		{
-			Recipe recipe = Main.recipe[i];
-
-			if (recipe.HasResult(ItemID.CopperPickaxe))
-			{
-				zenith = recipe;
+		BookEntry recipeEntry = new BookEntry {
+			Name = "RecipeTest",
+			Mod = this,
+			Items = {
+				new BookEntryItem_Text("Here's a recipe for a cool sword:"),
 			}
-		}
+		};
 
 		BookCategory sampleCategory = new BookCategory {
 			Name = "Tests",
@@ -34,14 +30,7 @@ public class BookTestBook : ModBook
 						new BookEntryItem_Text("Sed ac dolor sit amet purus malesuada congue. Fusce suscipit libero eget elit. Integer in sapien. Praesent id justo in neque elementum ultrices. Proin mattis lacinia justo. Praesent in mauris eu tortor porttitor accumsan. Aenean vel massa quis mauris vehicula lacinia. Suspendisse nisl. Vestibulum fermentum tortor id mi. Maecenas fermentum, sem in pharetra pellentesque, velit turpis volutpat ante, in pharetra metus odio a lectus. Nunc tincidunt ante vitae massa. Fusce aliquam vestibulum ipsum. Pellentesque arcu."),
 					}
 				},
-				new BookEntry {
-					Name = "RecipeTest",
-					Mod = this,
-					Items = {
-						new BookEntryItem_Text("Here's a recipe for a cool sword:"),
-						new BookEntryItem_Recipe(zenith)
-					}
-				},
+				recipeEntry,
 				new BookEntry {
 					Name = "VideoTest",
 					Mod = this,
@@ -51,6 +40,15 @@ public class BookTestBook : ModBook
 				}
 			}
 		};
+
+		for (int i = 0; i < 50; i++)
+		{
+			int random = Main.rand.Next(0, Recipe.numRecipes);
+
+			recipeEntry.Items.Add(new BookEntryItem_Recipe(Main.recipe[random]));
+		}
+
+
 		AddCategory(sampleCategory);
 	}
 }
