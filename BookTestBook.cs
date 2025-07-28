@@ -41,11 +41,12 @@ public class BookTestBook : ModBook
 			}
 		};
 
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			int random = Main.rand.Next(0, Recipe.numRecipes);
 
 			recipeEntry.Items.Add(new BookEntryItem_Recipe(Main.recipe[random]));
+			recipeEntry.Items.Add(new BookEntryItem_Text("...space..."));
 		}
 
 

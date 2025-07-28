@@ -25,17 +25,16 @@ public class UIItem : BaseElement
 		Padding = new Padding(6);
 	}
 
-	protected void DrawItem(SpriteBatch spriteBatch, Item item, float scale)
+	private void DrawItem(SpriteBatch spriteBatch, Item item, float scale)
 	{
-		Vector2 position = Dimensions.TopLeft() + Dimensions.Size() * 0.5f;
-
-		ItemSlot.DrawItemIcon(item, 0, spriteBatch, position, 1f, Math.Min(InnerDimensions.Width - 4, InnerDimensions.Height - 4), Color.White);
+		ItemSlot.DrawItemIcon(item, 0, spriteBatch, Dimensions.Center(), scale, Math.Min(InnerDimensions.Width - 4, InnerDimensions.Height - 4), Color.White);
 
 		if (item.stack > 1)
 		{
 			string text = item.stack.ToString();
 			float texscale = 0.75f;
 
+			// BUG: this is wrong if the slot is large
 			Vector2 textPos = InnerDimensions.BottomRight() - FontAssets.MouseText.Value.MeasureString(text) * texscale + new Vector2(-4f, 6f) * texscale;
 			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, text, textPos, Color.White, 0f, Vector2.Zero, new Vector2(texscale));
 		}
@@ -46,26 +45,6 @@ public class UIItem : BaseElement
 			Main.ItemIconCacheUpdate(0);
 			Main.HoverItem = item.Clone();
 			Main.hoverItemName = Main.HoverItem.Name;
-			
-			/*HoverItem = recipe[availableRecipe[focusRecipe]].requiredItem[i].Clone();
-			ItemSlot.MouseHover(22);
-			hoverItemName = recipe[availableRecipe[focusRecipe]].requiredItem[i].Name;
-			if (recipe[availableRecipe[focusRecipe]].ProcessGroupsForText(recipe[availableRecipe[focusRecipe]].requiredItem[i].type, out var theText))
-				HoverItem.SetNameOverride(theText);
-
-			if (recipe[availableRecipe[focusRecipe]].anyIronBar && recipe[availableRecipe[focusRecipe]].requiredItem[i].type == 22)
-				HoverItem.SetNameOverride(Lang.misc[37].Value + " " + Lang.GetItemNameValue(22));
-			else if (recipe[availableRecipe[focusRecipe]].anyWood && recipe[availableRecipe[focusRecipe]].requiredItem[i].type == 9)
-				HoverItem.SetNameOverride(Lang.misc[37].Value + " " + Lang.GetItemNameValue(9));
-			else if (recipe[availableRecipe[focusRecipe]].anySand && recipe[availableRecipe[focusRecipe]].requiredItem[i].type == 169)
-				HoverItem.SetNameOverride(Lang.misc[37].Value + " " + Lang.GetItemNameValue(169));
-			else if (recipe[availableRecipe[focusRecipe]].anyFragment && recipe[availableRecipe[focusRecipe]].requiredItem[i].type == 3458)
-				HoverItem.SetNameOverride(Lang.misc[37].Value + " " + Lang.misc[51].Value);
-			else if (recipe[availableRecipe[focusRecipe]].anyPressurePlate && recipe[availableRecipe[focusRecipe]].requiredItem[i].type == 542)
-				HoverItem.SetNameOverride(Lang.misc[37].Value + " " + Lang.misc[38].Value);
-
-			if (recipe[availableRecipe[focusRecipe]].requiredItem[i].stack > 1)
-				hoverItemName = hoverItemName + " (" + recipe[availableRecipe[focusRecipe]].requiredItem[i].stack + ")";*/
 		}
 	}
 

@@ -5,8 +5,10 @@ using BaseLibrary.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ReLogic.Content;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace BookLibrary.UI;
 
@@ -19,48 +21,33 @@ public class UIEntryItem_Recipe : UIEntryItem
 	}
 
 	private const int SlotSize = 48;
+	private const int ResultSlotSize = 80;
 
 	private readonly UIItem[] items;
 	private readonly GroupData[] groups;
-	private readonly ScreenTarget? target;
 
-	private Recipe recipe;
 	private int groupAnimationTimer;
 	private UIItem result;
+	private Vector2 tileSize;
 
 	// NOTE: maybe fallback to drawing the item if tile rendering fails
 	// NOTE: (?) show if player has the required items
-	// TODO: quantity location is too bottom-right for result
-	// TODO: result should be larger (icon not slot)
-	// TODO: rethink the position of UI elements (see https://discord.com/channels/103110554649894912/711551818194485259/1397871375661928448)
 
 	public UIEntryItem_Recipe(BookEntryItem_Recipe entry)
 	{
-		recipe = entry.Recipe;
+		Recipe recipe = entry.Recipe;
 
-		result = new UIItem(entry.Recipe.createItem) {
-			Size = Dimension.FromPixels(62),
-			Position = new Dimension(0, 6, 50, 0)
+		result = new UIItem(recipe.createItem) {
+			Size = Dimension.FromPixels(ResultSlotSize)
 		};
 		base.Add(result);
 
-		UIText text = new UIText("at") {
-			Size = Dimension.FromPixels(20, 62),
-			Position = new Dimension(48, 6, 50, 0),
-			Settings = {
-				VerticalAlignment = VerticalAlignment.Center,
-				TextColor = BookUI.TextColor,
-				BorderColor = Color.Transparent
-			}
-		};
-		base.Add(text);
+		items = new UIItem[recipe.requiredItem.Count];
+		groups = new GroupData[recipe.requiredItem.Count];
 
-		items = new UIItem[entry.Recipe.requiredItem.Count];
-		groups = new GroupData[entry.Recipe.requiredItem.Count];
-
-		for (int i = 0; i < entry.Recipe.requiredItem.Count; i++)
+		for (int i = 0; i < recipe.requiredItem.Count; i++)
 		{
-			Item item = entry.Recipe.requiredItem[i];
+			Item item = recipe.requiredItem[i];
 
 			groups[i] = new GroupData(recipe.acceptedGroups.FirstOrDefault(groupID => RecipeGroup.recipeGroups[groupID].ContainsItem(item.type), -1));
 
@@ -71,35 +58,13 @@ public class UIEntryItem_Recipe : UIEntryItem
 			base.Add(ingredient);
 		}
 
-		if (recipe.requiredTile.Count > 0)
+		for (int i = 0; i < recipe.requiredTile.Count; i++)
 		{
-			// TODO: only render if the recipe is visible
-			target = new ScreenTarget(sb => {
-				Main.graphics.GraphicsDevice.Clear(Color.Transparent);
-
-				sb.End();
-				sb.Begin();
-
-				CustomTileRenderer.PerformAction(() => {
-					float offset = 0f;
-					foreach (int tileID in recipe.requiredTile)
-					{
-						CustomTileRenderer.PlaceAndDrawTile(sb, tileID, new Vector2(offset, 0f), out Vector2 size);
-						offset += size.X + 16f;
-					}
-				});
-			}, () => true, 0f, _ => new Vector2(256f));
-		}
-	}
-
-	protected override void Draw(SpriteBatch spriteBatch)
-	{
-		base.Draw(spriteBatch);
-
-		if (target is not null)
-		{
-			// TODO: resize the result so they are all the same size
-			spriteBatch.Draw(target.RenderTarget, result.OuterDimensions.Right() + new Vector2(32f, 0f), Color.White);
+			UITile requiredTile = new UITile(recipe.requiredTile[i]) {
+				Position = Dimension.FromPixels(ResultSlotSize + 16 + i * (24 + 4), 0),
+				Size = Dimension.FromPixels(24)
+			};
+			base.Add(requiredTile);
 		}
 	}
 
@@ -128,27 +93,17 @@ public class UIEntryItem_Recipe : UIEntryItem
 
 	public override void Recalculate()
 	{
-		int numPerRow = (int)Math.Floor(InnerDimensions.Width / (float)SlotSize) - 1;
-		int rows = (int)Math.Ceiling(items.Length / (float)numPerRow);
-		int toRender = items.Length;
-		int center = InnerDimensions.Width / 2;
-
-		for (int row = 0; row < rows; row++)
+		// TODO: this will have issue with too many ingredients - UIGrid or s/e
+		for (int i = 0; i < items.Length; i++)
 		{
-			int limit = Math.Min(toRender, numPerRow);
-			int width = limit * (SlotSize + 8) - 8;
-			for (int i = 0; i < limit; i++)
-			{
-				toRender--;
+			UIItem item = items[i];
 
-				UIItem item = items[row * numPerRow + i];
-				item.Position.PixelsX = center - width / 2 + i * (SlotSize + 8);
-				item.Position.PixelsY = 76 + row * (SlotSize + 8);
-				item.Recalculate();
-			}
+			item.Position.PixelsX = ResultSlotSize + 16 + i * (SlotSize + 4);
+			item.Position.PixelsY = ResultSlotSize - SlotSize;
+			item.Recalculate();
 		}
 
-		Size.PixelsY = 76 + rows * (SlotSize + 8) - 8;
+		Size.PixelsY = ResultSlotSize;
 
 		base.Recalculate();
 	}

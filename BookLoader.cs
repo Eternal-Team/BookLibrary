@@ -36,7 +36,7 @@ public abstract class ModBook : ModType, ILocalizedModType
 		ModTypeLookup<ModBook>.Register(this);
 		BookLoader.Register(this);
 	}
-
+	
 	public sealed override void SetupContent()
 	{
 		SetStaticDefaults();

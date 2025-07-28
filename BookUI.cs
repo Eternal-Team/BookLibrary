@@ -32,7 +32,7 @@ public class BookUI : UIPanel
 		Display = Display.None;
 		Settings.Texture = ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/BookBackground");
 
-		UITexture textureReturn = new(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/ReturnButton")) {
+		UITexture textureReturn = new UITexture(ModContent.Request<Texture2D>("BookLibrary/Assets/Textures/ReturnButton")) {
 			Size = Dimension.FromPixels(30),
 			Position = Dimension.FromPixels(28, 12),
 			Settings = { ScaleMode = ScaleMode.Stretch, SamplerState = SamplerState.PointClamp }

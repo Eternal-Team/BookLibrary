@@ -37,6 +37,8 @@ internal static class CustomTileRenderer
 
 	public static void PerformAction(Action action)
 	{
+		if (Tilemap is null) return;
+
 		// BUG: seems like this isn't enough to stop world saving, might have to hook SaveWorld
 		bool prevAutosave = Main.skipMenu;
 		Main.skipMenu = true;
@@ -57,7 +59,6 @@ internal static class CustomTileRenderer
 		Main.skipMenu = prevAutosave;
 	}
 
-	// TODO: how would modded draw methods work? a flag?
 	private static void DrawSingleTile(TileDrawInfo drawData, int tileX, int tileY, Vector2 screenPosition, Vector2 screenOffset)
 	{
 		drawData.tileCache = Main.tile[tileX, tileY];
@@ -71,14 +72,14 @@ internal static class CustomTileRenderer
 
 		Main.instance.TilesRenderer.GetTileDrawData(tileX, tileY, drawData.tileCache, drawData.typeCache, ref drawData.tileFrameX, ref drawData.tileFrameY, out drawData.tileWidth, out drawData.tileHeight, out drawData.tileTop, out drawData.halfBrickHeight, out drawData.addFrX, out drawData.addFrY, out drawData.tileSpriteEffect, out drawData.glowTexture, out drawData.glowSourceRect, out drawData.glowColor);
 		drawData.drawTexture = Main.instance.TilesRenderer.GetTileDrawTexture(drawData.tileCache, tileX, tileY);
-		Texture2D highlightTexture = null;
+		Texture2D? highlightTexture = null;
 		Color highlightColor = Color.Transparent;
 		if (TileID.Sets.HasOutlines[drawData.typeCache])
 			Main.instance.TilesRenderer.GetTileOutlineInfo(tileX, tileY, drawData.typeCache, ref drawData.tileLight, ref highlightTexture, ref highlightColor);
 
 		Main.instance.TilesRenderer.CacheSpecialDraws_Part1(tileX, tileY, drawData.typeCache, drawData.tileFrameX, drawData.tileFrameY, false);
 		Main.instance.TilesRenderer.CacheSpecialDraws_Part2(tileX, tileY, drawData, false);
-		
+
 		if (drawData is { typeCache: TileID.MushroomTrees, tileFrameX: >= 36 })
 		{
 			int num4 = drawData.tileFrameY switch {
@@ -177,7 +178,6 @@ internal static class CustomTileRenderer
 		}
 
 		Main.instance.TilesRenderer.DrawBasicTile(screenPosition, screenOffset, tileX, tileY, drawData, normalTileRectangle, normalTilePosition);
-		// typeof(TileDrawing).GetMethod("DrawBasicTile", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(Main.instance.TilesRenderer, new object?[] { screenPosition, screenOffset, tileX, tileY, drawData, normalTileRectangle, normalTilePosition });
 
 		if (Main.tileGlowMask[drawData.tileCache.TileType] != -1)
 		{
@@ -270,7 +270,7 @@ internal static class CustomTileRenderer
 
 			if (!flag2)
 			{
-				if (drawData.tileCache.Slope == 0 && !drawData.tileCache.IsHalfBlock)
+				if (drawData.tileCache is { Slope: 0, IsHalfBlock: false })
 				{
 					Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition, new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight), color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 				}
@@ -359,20 +359,7 @@ internal static class CustomTileRenderer
 		}
 	}
 
-	public static void DrawTileRegion(SpriteBatch spriteBatch, int startX, int startY, int endX, int endY)
-	{
-		for (int y = startY; y <= endY; y++)
-		{
-			for (int x = startX; x <= endX; x++)
-			{
-				// What is missing: TileLoader.PreDraw, adding special draw points, TileLoader.PostDraw
-				DrawSingleTile(tileDrawInfo, x, y, Vector2.Zero, Vector2.Zero);
-			}
-		}
-	}
-
-	// NOTE: some tile types just don't work because Terraria is stupid
-	public static void PlaceAndDrawTile(SpriteBatch spriteBatch, int tileID, Vector2 position, out Vector2 size)
+	public static void PlaceAndDrawTile(int tileType, Vector2 position, out Vector2 size)
 	{
 		for (int x = 5; x <= 25; x++)
 		{
@@ -384,19 +371,19 @@ internal static class CustomTileRenderer
 
 		const int baseX = 5, baseY = 5;
 
-		TileObjectData? data = TileObjectData.GetTileData(tileID, 0);
+		TileObjectData? data = TileObjectData.GetTileData(tileType, 0);
 		if (data == null)
 		{
-			WorldGen.PlaceTile(baseX, baseY, tileID, true, true, -1, 0);
-			WorldGen.PlaceTile(baseX + 1, baseY, tileID, true, true, -1, 0);
-			WorldGen.PlaceTile(baseX + 1, baseY + 1, tileID, true, true, -1, 0);
-			WorldGen.PlaceTile(0, baseY + 1, tileID, true, true, -1, 0);
+			WorldGen.PlaceTile(baseX, baseY, tileType, true, true, -1, 0);
+			WorldGen.PlaceTile(baseX + 1, baseY, tileType, true, true, -1, 0);
+			WorldGen.PlaceTile(baseX + 1, baseY + 1, tileType, true, true, -1, 0);
+			WorldGen.PlaceTile(0, baseY + 1, tileType, true, true, -1, 0);
 
 			size = new Vector2(32f);
 		}
 		else
 		{
-			TileObject.CanPlace(baseX + data.Origin.X, baseY + data.Origin.Y, tileID, 0, 0, out TileObject objectData);
+			TileObject.CanPlace(baseX + data.Origin.X, baseY + data.Origin.Y, tileType, 0, 0, out TileObject objectData);
 			TileObject.Place(objectData);
 
 			size = new Vector2(data.Width * 16f, data.Height * 16f);
@@ -414,7 +401,7 @@ internal static class CustomTileRenderer
 				if (!TileLoader.PreDraw(x, y, tile.type, Main.spriteBatch))
 					goto PostDraw;
 
-				switch (tile.TileType)
+				/*switch (tile.TileType)
 				{
 					case 52:
 					case 62:
@@ -549,15 +536,15 @@ internal static class CustomTileRenderer
 						// continue;
 						// }
 						break;
-				}
+				}*/
 
-				DrawSingleTile(tileDrawInfo, x, y, topLeft.ToVector2() * 16f - position * Main.UIScale, Vector2.Zero);
+				DrawSingleTile(tileDrawInfo, x, y, topLeft.ToVector2() * 16f - position, Vector2.Zero);
 
 				PostDraw:
 				TileLoader.PostDraw(x, y, tile.type, Main.spriteBatch);
 			}
 		}
-		
-		Main.instance.TilesRenderer.DrawSpecialTilesLegacy(topLeft.ToVector2() * 16f - position * Main.UIScale, Vector2.Zero);
+
+		Main.instance.TilesRenderer.DrawSpecialTilesLegacy(topLeft.ToVector2() * 16f - position, Vector2.Zero);
 	}
 }
